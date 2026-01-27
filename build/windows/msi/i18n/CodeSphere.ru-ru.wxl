@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <WixLocalization Culture="ru-ru" Codepage="1251" xmlns="http://schemas.microsoft.com/wix/2006/localization">
   <String Id="ProductLanguage">1049</String>
   <String Id="ProductName">@@PRODUCT_NAME@@</String>
   <String Id="ProductHelpLink">https://github.com/CodeSphere/CodeSphere</String>
   <String Id="ProductUrlInfoAbout">https://github.com/CodeSphere/CodeSphere</String>
   <String Id="ProductUrlUpdateInfo">https://github.com/CodeSphere/CodeSphere</String>
-  <String Id="PackageDescription">Пакет с @@PRODUCT_NAME@@</String>
-  <String Id="FeatureStartMenuShortcutTitle">Ярлык в меню «Пуск»</String>
-  <String Id="FeatureStartMenuShortcutDescription">Создайте значок в меню «Пуск».</String>
-  <String Id="FeatureDesktopShortcutTitle">Ярлык рабочего стола</String>
-  <String Id="FeatureDesktopShortcutDescription">Создать значок на рабочем столе.</String>
-  <String Id="FeatureFileTypeAssociationsTitle">Ассоциации файлов</String>
-  <String Id="FeatureFileTypeAssociationsDescription">Зарегистрировать @@PRODUCT_NAME@@ в качестве редактора поддерживаемых типов файлов.</String>
-  <String Id="FeatureAddContextMenuFilesTitle">Контекстное меню файлов</String>
-  <String Id="FeatureAddContextMenuFilesDescription">Добавить действие «Открыть с помощью @@PRODUCT_NAME@@» в контекстное меню файлов Проводника Windows.</String>
-  <String Id="FeatureAddContextMenuFoldersTitle">Контекстное меню каталога</String>
-  <String Id="FeatureAddContextMenuFoldersDescription">Добавить действие «Открыть с помощью @@PRODUCT_NAME@@» в контекстное меню каталога Проводника Windows.</String>
-  <String Id="FeatureEnvironmentTitle">Добавить в PATH</String>
-  <String Id="FeatureEnvironmentDescription">Добавить @@PRODUCT_NAME@@ в переменную среды PATH. Доступно после перезапуска.</String>
-  <String Id="LaunchApplication">Запустить @@PRODUCT_NAME@@</String>
-  <String Id="NewerVersionInstalled">Новая версия @@PRODUCT_NAME@@ уже установлена.</String>
-  <String Id="MinimumNetFramworkRequired">Приложению требуется .NET Framework 4.5.2 или более новая версии. Пожалуйста, установите .NET Framework, затем снова запустите установщик.</String>
-  <String Id="OSVersionRequired">Требуется Windows 7 или более новая версия.</String>
+  <String Id="PackageDescription">ÐŸÐ°ÐºÐµÑ‚ Ñ @@PRODUCT_NAME@@</String>
+  <String Id="FeatureStartMenuShortcutTitle">Ð¯Ñ€Ð»Ñ‹Ðº Ð² Ð¼ÐµÐ½ÑŽ Â«ÐŸÑƒÑÐºÂ»</String>
+  <String Id="FeatureStartMenuShortcutDescription">Ð¡Ð¾Ð·Ð´Ð°Ð¹Ñ‚Ðµ Ð·Ð½Ð°Ñ‡Ð¾Ðº Ð² Ð¼ÐµÐ½ÑŽ Â«ÐŸÑƒÑÐºÂ».</String>
+  <String Id="FeatureDesktopShortcutTitle">Ð¯Ñ€Ð»Ñ‹Ðº Ñ€Ð°Ð±Ð¾Ñ‡ÐµÐ³Ð¾ ÑÑ‚Ð¾Ð»Ð°</String>
+  <String Id="FeatureDesktopShortcutDescription">Ð¡Ð¾Ð·Ð´Ð°Ñ‚ÑŒ Ð·Ð½Ð°Ñ‡Ð¾Ðº Ð½Ð° Ñ€Ð°Ð±Ð¾Ñ‡ÐµÐ¼ ÑÑ‚Ð¾Ð»Ðµ.</String>
+  <String Id="FeatureFileTypeAssociationsTitle">ÐÑÑÐ¾Ñ†Ð¸Ð°Ñ†Ð¸Ð¸ Ñ„Ð°Ð¹Ð»Ð¾Ð²</String>
+  <String Id="FeatureFileTypeAssociationsDescription">Ð—Ð°Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ @@PRODUCT_NAME@@ Ð² ÐºÐ°Ñ‡ÐµÑÑ‚Ð²Ðµ Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¾Ñ€Ð° Ð¿Ð¾Ð´Ð´ÐµÑ€Ð¶Ð¸Ð²Ð°ÐµÐ¼Ñ‹Ñ… Ñ‚Ð¸Ð¿Ð¾Ð² Ñ„Ð°Ð¹Ð»Ð¾Ð².</String>
+  <String Id="FeatureAddContextMenuFilesTitle">ÐšÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð½Ð¾Ðµ Ð¼ÐµÐ½ÑŽ Ñ„Ð°Ð¹Ð»Ð¾Ð²</String>
+  <String Id="FeatureAddContextMenuFilesDescription">Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ Â«ÐžÑ‚ÐºÑ€Ñ‹Ñ‚ÑŒ Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒÑŽ @@PRODUCT_NAME@@Â» Ð² ÐºÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð½Ð¾Ðµ Ð¼ÐµÐ½ÑŽ Ñ„Ð°Ð¹Ð»Ð¾Ð² ÐŸÑ€Ð¾Ð²Ð¾Ð´Ð½Ð¸ÐºÐ° Windows.</String>
+  <String Id="FeatureAddContextMenuFoldersTitle">ÐšÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð½Ð¾Ðµ Ð¼ÐµÐ½ÑŽ ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ð°</String>
+  <String Id="FeatureAddContextMenuFoldersDescription">Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ Â«ÐžÑ‚ÐºÑ€Ñ‹Ñ‚ÑŒ Ñ Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒÑŽ @@PRODUCT_NAME@@Â» Ð² ÐºÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð½Ð¾Ðµ Ð¼ÐµÐ½ÑŽ ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ð° ÐŸÑ€Ð¾Ð²Ð¾Ð´Ð½Ð¸ÐºÐ° Windows.</String>
+  <String Id="FeatureEnvironmentTitle">Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð² PATH</String>
+  <String Id="FeatureEnvironmentDescription">Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ @@PRODUCT_NAME@@ Ð² Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½ÑƒÑŽ ÑÑ€ÐµÐ´Ñ‹ PATH. Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾ Ð¿Ð¾ÑÐ»Ðµ Ð¿ÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑÐºÐ°.</String>
+  <String Id="LaunchApplication">Ð—Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚ÑŒ @@PRODUCT_NAME@@</String>
+  <String Id="NewerVersionInstalled">ÐÐ¾Ð²Ð°Ñ Ð²ÐµÑ€ÑÐ¸Ñ @@PRODUCT_NAME@@ ÑƒÐ¶Ðµ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð»ÐµÐ½Ð°.</String>
+  <String Id="MinimumNetFramworkRequired">ÐŸÑ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸ÑŽ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ .NET Framework 4.5.2 Ð¸Ð»Ð¸ Ð±Ð¾Ð»ÐµÐµ Ð½Ð¾Ð²Ð°Ñ Ð²ÐµÑ€ÑÐ¸Ð¸. ÐŸÐ¾Ð¶Ð°Ð»ÑƒÐ¹ÑÑ‚Ð°, ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚Ðµ .NET Framework, Ð·Ð°Ñ‚ÐµÐ¼ ÑÐ½Ð¾Ð²Ð° Ð·Ð°Ð¿ÑƒÑÑ‚Ð¸Ñ‚Ðµ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ñ‰Ð¸Ðº.</String>
+  <String Id="OSVersionRequired">Ð¢Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Windows 7 Ð¸Ð»Ð¸ Ð±Ð¾Ð»ÐµÐµ Ð½Ð¾Ð²Ð°Ñ Ð²ÐµÑ€ÑÐ¸Ñ.</String>
 </WixLocalization>
