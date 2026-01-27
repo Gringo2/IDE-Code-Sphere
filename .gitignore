@@ -1,7 +1,15 @@
-vscode*
-VS*/*
-VSCode*
-CodeSphere*
+# Build artifacts
+vscode/
+VSCode-win32-*
+VSCode-darwin-*
+VSCode-linux-*
+vscode-reh-*
+vscode-reh-web-*
+CodeSphereSetup-*
+CodeSphereUserSetup-*
+CodeSphere-x64-*
+CodeSphere-arm64-*
+CodeSphere-ia32-*
 .DS_Store
 *.env
 assets/
