@@ -12,6 +12,31 @@
     <Property Id="ARPPRODUCTICON" Value="code.ico" />
     <SetProperty Id="ARPINSTALLLOCATION" Value="[APPLICATIONFOLDER]" After="CostFinalize" />
     <Icon Id="code.ico" SourceFile="$(var.IconDir)\code.ico" />
+    <Icon Id="BOWER.ICO" SourceFile="$(var.IconDir)\bower.ico" />
+    <Icon Id="C.ICO" SourceFile="$(var.IconDir)\c.ico" />
+    <Icon Id="CONFIG.ICO" SourceFile="$(var.IconDir)\config.ico" />
+    <Icon Id="CPP.ICO" SourceFile="$(var.IconDir)\cpp.ico" />
+    <Icon Id="CSHARP.ICO" SourceFile="$(var.IconDir)\csharp.ico" />
+    <Icon Id="CSS.ICO" SourceFile="$(var.IconDir)\css.ico" />
+    <Icon Id="DEFAULT.ICO" SourceFile="$(var.IconDir)\code.ico" />
+    <Icon Id="GO.ICO" SourceFile="$(var.IconDir)\code.ico" />
+    <Icon Id="HTML.ICO" SourceFile="$(var.IconDir)\html.ico" />
+    <Icon Id="JADE.ICO" SourceFile="$(var.IconDir)\jade.ico" />
+    <Icon Id="JAVA.ICO" SourceFile="$(var.IconDir)\java.ico" />
+    <Icon Id="JAVASCRIPT.ICO" SourceFile="$(var.IconDir)\javascript.ico" />
+    <Icon Id="JSON.ICO" SourceFile="$(var.IconDir)\json.ico" />
+    <Icon Id="LESS.ICO" SourceFile="$(var.IconDir)\less.ico" />
+    <Icon Id="MARKDOWN.ICO" SourceFile="$(var.IconDir)\markdown.ico" />
+    <Icon Id="PHP.ICO" SourceFile="$(var.IconDir)\php.ico" />
+    <Icon Id="POWERSHELL.ICO" SourceFile="$(var.IconDir)\powershell.ico" />
+    <Icon Id="PYTHON.ICO" SourceFile="$(var.IconDir)\python.ico" />
+    <Icon Id="REACT.ICO" SourceFile="$(var.IconDir)\react.ico" />
+    <Icon Id="RUBY.ICO" SourceFile="$(var.IconDir)\ruby.ico" />
+    <Icon Id="SHELL.ICO" SourceFile="$(var.IconDir)\shell.ico" />
+    <Icon Id="TYPESCRIPT.ICO" SourceFile="$(var.IconDir)\typescript.ico" />
+    <Icon Id="VUE.ICO" SourceFile="$(var.IconDir)\vue.ico" />
+    <Icon Id="XML.ICO" SourceFile="$(var.IconDir)\xml.ico" />
+    <Icon Id="YAML.ICO" SourceFile="$(var.IconDir)\yaml.ico" />
 
     <!-- Microsoft .NET Framework 4.5.2 is required for CodeSphere. If you are using Windows 7, please make sure .NET Framework 4.5.2 is installed. -->
     <PropertyRef Id='WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED' />
