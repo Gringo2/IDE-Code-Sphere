@@ -47,7 +47,7 @@ elif [[ "${VSCODE_ARCH}" == "ppc64le" ]]; then
   VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME="vscodium/vscodium-linux-build-agent:focal-devtoolset-ppc64le"
   VSCODE_SYSROOT_PREFIX="-glibc-${GLIBC_VERSION}"
 
-  export VSCODE_SYSROOT_REPOSITORY='vscodium/vscodium-linux-build-agent'
+  export VSCODE_SYSROOT_REPOSITORY='VSCodium/vscode-linux-build-agent'
   export VSCODE_SYSROOT_VERSION='20240129-253798'
 elif [[ "${VSCODE_ARCH}" == "riscv64" ]]; then
   NODE_VERSION="20.16.0"
@@ -67,7 +67,7 @@ elif [[ "${VSCODE_ARCH}" == "s390x" ]]; then
   VSCODE_REMOTE_DEPENDENCIES_CONTAINER_NAME="vscodium/vscodium-linux-build-agent:focal-devtoolset-s390x"
   VSCODE_SYSROOT_PREFIX="-glibc-${GLIBC_VERSION}"
 
-  export VSCODE_SYSROOT_REPOSITORY='vscodium/vscodium-linux-build-agent'
+  export VSCODE_SYSROOT_REPOSITORY='VSCodium/vscode-linux-build-agent'
   export VSCODE_SYSROOT_VERSION='20241108'
 fi
 
