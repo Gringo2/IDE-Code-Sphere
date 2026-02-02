@@ -60,8 +60,20 @@ jobs:
         run: ./build.sh
         if: env.SHOULD_BUILD == 'yes'
 
+      - name: Check secrets
+        id: check_secrets
+        shell: bash
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+           if [[ -n "$GPG_KEY" ]]; then
+             echo "has_gpg=true" >> "$GITHUB_OUTPUT"
+           else
+             echo "has_gpg=false" >> "$GITHUB_OUTPUT"
+           fi
+
       - name: Import GPG key
-        if: env.SHOULD_BUILD == 'yes' && github.event.inputs.dont_update != 'true' && secrets.GPG_PRIVATE_KEY != ''
+        if: env.SHOULD_BUILD == 'yes' && github.event.inputs.dont_update != 'true' && steps.check_secrets.outputs.has_gpg == 'true'
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
