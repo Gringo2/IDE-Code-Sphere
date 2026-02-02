@@ -125,7 +125,11 @@ flatpak run com.CodeSphere.codesphere
 
 ## <a id="build"></a>Build
 
-Build instructions can be found [here](https://github.com/CodeSphere/CodeSphere/blob/master/docs/howto-build.md)
+- [Building CodeSphere](./howto-build.md)
+- [Design Documentation (Internal)](./design/index.md)
+    - [SRS - Software Requirements Specification](./design/srs.md)
+    - [System Design](./design/system_design.md)
+    - [Architecture](./design/architecture.md)
 
 ## <a id="why"></a>Why Does This Exist
 
@@ -156,6 +160,8 @@ Microsoft's build process (which we are running to build the binaries) does down
 ### Documentation
 
 For more information on getting all the telemetry disabled, tips for migrating from Visual Studio Code to CodeSphere and more, have a look at [the Docs page](https://github.com/CodeSphere/CodeSphere/blob/master/docs/index.md) page.
+
+Detailed technical documentation, including the **SRS**, **System Design**, and **Architecture**, can be found in the [Design Documentation](./docs/design/index.md) folder.
 
 ### Troubleshooting
 

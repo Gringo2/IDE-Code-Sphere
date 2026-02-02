@@ -1,0 +1,49 @@
+site_name: CodeSphere IDE Design Docs
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.follow
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence.fence_mermaid
+  - admonition
+  - attr_list
+  - md_in_html
+
+nav:
+  - User Guide:
+    - Welcome: index.md
+    - Getting Started: getting-started.md
+    - Telemetry & Privacy: telemetry.md
+    - Extensions & Marketplace: extensions.md
+    - Migration Guide: migration.md
+    - Usage & Tips: usage.md
+    - Troubleshooting: troubleshooting.md
+  - Development:
+    - How to Build: howto-build.md
+    - Design Docs:
+      - Overview: design/index.md
+      - SRS: design/srs.md
+      - System Design: design/system_design.md
+      - Architecture: design/architecture.md
+      - Diagrams: design/diagrams.md

@@ -42,3 +42,7 @@
   - [What are reh and reh-web archives?](https://github.com/CodeSphere/CodeSphere/blob/master/docs/others.md#reh)
 - [Contributing Guidelines](https://github.com/CodeSphere/CodeSphere/blob/master/CONTRIBUTING.md)
 - [Building CodeSphere](https://github.com/CodeSphere/CodeSphere/blob/master/docs/howto-build.md)
+- [Design Documentation (Internal)](../designdocs/docs/index.md)
+    - [SRS - Software Requirements Specification](../designdocs/docs/srs.md)
+    - [System Design](../designdocs/docs/system_design.md)
+    - [Architecture](../designdocs/docs/architecture.md)
