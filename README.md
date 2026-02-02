@@ -14,6 +14,7 @@
 [![build status (linux)](https://img.shields.io/github/actions/workflow/status/CodeSphere/CodeSphere/stable-linux.yml?branch=master&label=build%28linux%29)](https://github.com/CodeSphere/CodeSphere/actions/workflows/stable-linux.yml?query=branch%3Amaster)
 [![build status (macos)](https://img.shields.io/github/actions/workflow/status/CodeSphere/CodeSphere/stable-macos.yml?branch=master&label=build%28macOS%29)](https://github.com/CodeSphere/CodeSphere/actions/workflows/stable-macos.yml?query=branch%3Amaster)
 [![build status (windows)](https://img.shields.io/github/actions/workflow/status/CodeSphere/CodeSphere/stable-windows.yml?branch=master&label=build%28windows%29)](https://github.com/CodeSphere/CodeSphere/actions/workflows/stable-windows.yml?query=branch%3Amaster)
+[![build status (insider spearhead)](https://img.shields.io/github/actions/workflow/status/CodeSphere/CodeSphere/insider-spearhead.yml?branch=master&label=insider-spearhead)](https://github.com/CodeSphere/CodeSphere/actions/workflows/insider-spearhead.yml?query=branch%3Amaster)
 
 </div>
 
@@ -159,23 +160,34 @@ Microsoft's build process (which we are running to build the binaries) does down
 
 ### Documentation
 
-For more information on getting all the telemetry disabled, tips for migrating from Visual Studio Code to CodeSphere and more, have a look at [the Docs page](https://github.com/CodeSphere/CodeSphere/blob/master/docs/index.md) page.
+For more information on getting all the telemetry disabled, tips for migrating from Visual Studio Code to CodeSphere and more, have a look at [the Docs page](./docs/index.md).
 
-Detailed technical documentation, including the **SRS**, **System Design**, and **Architecture**, can be found in the [Design Documentation](./docs/design/index.md) folder.
+**Developer Documentation**:
+- [CI/CD Workflows](./docs/ci-cd-workflows.md)
+- [How to Build](./docs/howto-build.md)
+- [Rebranding Guide](./docs/rebranding-guide.md)
+- [Release Process](./docs/release-process.md)
+- [Patch System](./docs/patch-system.md)
+- [Dev Scripts Reference](./docs/dev-scripts.md)
+
+**Design Documentation**:
+- [Architecture Overview](./docs/design/index.md)
+- [Software Requirements (SRS)](./docs/design/srs.md)
+- [Build System Architecture](./docs/design/ci-cd-architecture.md)
 
 ### Troubleshooting
 
-If you have any issue, please check [the Troubleshooting page](https://github.com/CodeSphere/CodeSphere/blob/master/docs/troubleshooting.md) or the existing issues.
+If you have any issue, please check [the Troubleshooting page](./docs/troubleshooting.md) or the existing issues.
 
 ### Extensions and the Marketplace
 
-According to the Visual Studio Marketplace [Terms of Use](https://aka.ms/vsmarketplace-ToU), _you may only install and use Marketplace Offerings with Visual Studio Products and Services._ For this reason, CodeSphere uses [open-vsx.org](https://open-vsx.org/), an open source registry for Visual Studio Code extensions. See the [Extensions + Marketplace](https://github.com/CodeSphere/CodeSphere/blob/master/docs/index.md#extensions-marketplace) section on the Docs page for more details.
+According to the Visual Studio Marketplace [Terms of Use](https://aka.ms/vsmarketplace-ToU), _you may only install and use Marketplace Offerings with Visual Studio Products and Services._ For this reason, CodeSphere uses [open-vsx.org](https://open-vsx.org/), an open source registry for Visual Studio Code extensions. See the [Extensions + Marketplace](./docs/extensions.md) page for more details.
 
-Please note that some Visual Studio Code extensions have licenses that restrict their use to the official Visual Studio Code builds and therefore do not work with CodeSphere. See [this note](https://github.com/CodeSphere/CodeSphere/blob/master/docs/extensions.md#proprietary-debugging-tools) on the Docs page for what's been found so far and possible workarounds.
+Please note that some Visual Studio Code extensions have licenses that restrict their use to the official Visual Studio Code builds and therefore do not work with CodeSphere. See [this note](./docs/extensions-compatibility.md) for what's been found so far and possible workarounds.
 
 ### How are the CodeSphere binaries built?
 
-If you would like to see the commands we run to build `vscode` into CodeSphere binaries, have a look at the workflow files in `.github/workflows` for Windows, GNU/Linux and macOS. These build files call all the other scripts in the repo. If you find something that doesn't make sense, feel free to ask about it [on Gitter](https://gitter.im/CodeSphere/Lobby).
+If you would like to see the commands we run to build `vscode` into CodeSphere binaries, have a look at the [CI/CD Workflows](./docs/ci-cd-workflows.md) documentation and the workflow files in `.github/workflows` for Windows, GNU/Linux and macOS. These build files call all the other scripts in the repo. If you find something that doesn't make sense, feel free to ask about it [on Gitter](https://gitter.im/CodeSphere/Lobby).
 
 The builds are run every day, but exit early if there isn't a new release from Microsoft.
 

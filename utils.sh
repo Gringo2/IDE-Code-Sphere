@@ -56,6 +56,7 @@ replace() {
   fi
 }
 
+
 if ! exists gsed; then
   if is_gnu_sed; then
     function gsed() {
@@ -67,3 +68,56 @@ if ! exists gsed; then
     }
   fi
 fi
+
+check_command() {
+  if ! command -v "$1" &> /dev/null; then
+    echo "Error: Command '$1' not found. Please install it." >&2
+    return 1
+  fi
+}
+
+check_all_deps() {
+  echo "Checking dependencies..."
+  local deps=("git" "node" "npm" "python" "jq")
+  
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    deps+=("iconutil")
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    deps+=("rpmbuild" "dpkg-deb")
+  fi
+
+  for dep in "${deps[@]}"; do
+    check_command "$dep" || return 1
+  done
+  echo "All dependencies found."
+}
+
+download_file() {
+  local url="$1"
+  local dest="$2"
+  
+  echo "Downloading $url to $dest..."
+  if command -v curl &> /dev/null; then
+    curl -L -o "$dest" "$url"
+  elif command -v wget &> /dev/null; then
+    wget -O "$dest" "$url"
+  else
+    echo "Error: Neither curl nor wget found." >&2
+    return 1
+  fi
+}
+
+extract_archive() {
+  local file="$1"
+  local dir="${2:-.}"
+  
+  echo "Extracting $file to $dir..."
+  mkdir -p "$dir"
+  
+  case "$file" in
+    *.tar.gz|*.tgz) tar -xzf "$file" -C "$dir" ;;
+    *.tar.bz2)      tar -xjf "$file" -C "$dir" ;;
+    *.zip)          unzip -q "$file" -d "$dir" ;;
+    *)              echo "Unknown archive format: $file" >&2; return 1 ;;
+  esac
+}

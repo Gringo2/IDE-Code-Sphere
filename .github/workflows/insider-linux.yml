@@ -14,11 +14,6 @@ on:
         description: Checkout PR
   repository_dispatch:
     types: [insider]
-  push:
-    branches: [ insider, main ]
-    paths-ignore:
-    - '**/*.md'
-    - 'upstream/*.json'
   pull_request:
     branches: [ insider, main ]
     paths-ignore:
