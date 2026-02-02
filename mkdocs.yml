@@ -36,14 +36,26 @@ nav:
     - Getting Started: getting-started.md
     - Telemetry & Privacy: telemetry.md
     - Extensions & Marketplace: extensions.md
+    - Extensions Compatibility: extensions-compatibility.md
+    - GitHub Copilot: ext-github-copilot.md
+    - Accounts Authentication: accounts-authentication.md
     - Migration Guide: migration.md
     - Usage & Tips: usage.md
     - Troubleshooting: troubleshooting.md
+    - Other Resources: others.md
   - Development:
     - How to Build: howto-build.md
+    - Contributing: ../CONTRIBUTING.md
+    - Code of Conduct: ../CODE_OF_CONDUCT.md
+    - CI/CD Workflows: ci-cd-workflows.md
+    - Release Process: release-process.md
+    - Rebranding Guide: rebranding-guide.md
+    - Patch System: patch-system.md
+    - Dev Scripts Reference: dev-scripts.md
     - Design Docs:
       - Overview: design/index.md
       - SRS: design/srs.md
       - System Design: design/system_design.md
       - Architecture: design/architecture.md
+      - CI/CD Architecture: design/ci-cd-architecture.md
       - Diagrams: design/diagrams.md
