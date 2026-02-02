@@ -22,7 +22,10 @@ else
   LATEST_VERSION=$( echo "${GITHUB_RESPONSE}" | jq -c -r '.tag_name' )
   RECHECK_ASSETS="${SHOULD_BUILD}"
 
-  if [[ "${LATEST_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5]) ]]; then
+  if [[ "${GITHUB_RESPONSE}" =~ "Not Found" ]]; then
+    echo "No release found in ${ASSETS_REPOSITORY}"
+    ASSETS="null"
+  elif [[ "${LATEST_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-9]+) ]]; then
     if [[ "${MS_TAG}" != "${BASH_REMATCH[1]}" ]]; then
       echo "New VSCode version, new build"
       export SHOULD_BUILD="yes"
