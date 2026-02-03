@@ -36,6 +36,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      
+      - name: Make scripts executable
+        run: chmod +x *.sh
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v6
@@ -89,6 +92,7 @@ jobs:
 
       - name: Upload sourcemaps
         env:
+          GH_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./upload_sourcemaps.sh
