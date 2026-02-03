@@ -20,7 +20,7 @@ git restore .
 CHANGES=$( git status --porcelain )
 
 if [[ -n "${CHANGES}" ]]; then
-  git commit -S -m "build(${VSCODE_QUALITY}): update to commit ${MS_COMMIT:0:7}"
+  git commit -m "build(${VSCODE_QUALITY}): update to commit ${MS_COMMIT:0:7}"
 
   BRANCH_NAME=$( git rev-parse --abbrev-ref HEAD )
 
