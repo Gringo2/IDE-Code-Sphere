@@ -1,6 +1,6 @@
 <div id="codesphere-logo" align="center">
     <br />
-    <img src="./icons/stable/codesphere.png"转向 "CodeSphere Logo" width="200"/>
+    <img src="./icons/stable/codesphere.png" alt="CodeSphere Logo" width="200"/>
     <h1>CodeSphere</h1>
     <h3>Free/Libre Open Source Software Binaries of Visual Studio Code</h3>
 </div>

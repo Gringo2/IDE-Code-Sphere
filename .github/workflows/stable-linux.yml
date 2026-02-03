@@ -50,6 +50,9 @@ jobs:
         with:
           ref: ${{ env.GITHUB_BRANCH }}
 
+      - name: Make scripts executable
+        run: chmod +x *.sh
+
       - name: Switch to relevant branch
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
@@ -86,6 +89,10 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.GITHUB_BRANCH }}
+        if: env.SHOULD_BUILD == 'yes'
+
+      - name: Make scripts executable
+        run: chmod +x *.sh
         if: env.SHOULD_BUILD == 'yes'
 
       - name: Switch to relevant branch
@@ -197,6 +204,10 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.GITHUB_BRANCH }}
+        if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
+
+      - name: Make scripts executable
+        run: chmod +x *.sh
         if: env.DISABLED != 'yes' && env.SHOULD_BUILD == 'yes'
 
       - name: Switch to relevant branch
@@ -314,6 +325,10 @@ jobs:
           ref: ${{ env.GITHUB_BRANCH }}
         if: env.DISABLED != 'yes'
 
+      - name: Make scripts executable
+        run: chmod +x *.sh
+        if: env.DISABLED != 'yes'
+
       - name: Switch to relevant branch
         env:
           PULL_REQUEST_ID: ${{ github.event.inputs.checkout_pr }}
@@ -413,6 +428,9 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.GITHUB_BRANCH }}
+
+      - name: Make scripts executable
+        run: chmod +x *.sh
 
       - name: Switch to relevant branch
         env:
@@ -517,6 +535,9 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.GITHUB_BRANCH }}
+
+      - name: Make scripts executable
+        run: chmod +x *.sh
 
       - name: Switch to relevant branch
         env:
