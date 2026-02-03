@@ -45,8 +45,8 @@ nav:
     - Other Resources: others.md
   - Development:
     - How to Build: howto-build.md
-    - Contributing: ../CONTRIBUTING.md
-    - Code of Conduct: ../CODE_OF_CONDUCT.md
+    - Contributing: contributing.md
+    - Code of Conduct: code-of-conduct.md
     - CI/CD Workflows: ci-cd-workflows.md
     - Release Process: release-process.md
     - Rebranding Guide: rebranding-guide.md
