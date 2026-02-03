@@ -1,5 +1,8 @@
 name: stable-macos
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
