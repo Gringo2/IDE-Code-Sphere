@@ -306,8 +306,8 @@ diff --git a/extensions/tunnel-forwarding/src/extension.ts b/extensions/tunnel-f
 index 299c728..9fb635d 100644
 --- a/extensions/tunnel-forwarding/src/extension.ts
 +++ b/extensions/tunnel-forwarding/src/extension.ts
-@@ -28,3 +28,3 @@ const cliPath = process.env.VSCODE_FORWARDING_IS_DEV
- 		process.platform === 'darwin' ? 'bin' : '../../bin',
--		vscode.env.appQuality === 'stable' ? 'code-tunnel' : 'code-tunnel-insiders',
-+		'!!TUNNEL_APP_NAME!!'
- 	) + (process.platform === 'win32' ? '.exe' : '');
+@@ -34,3 +34,3 @@ if (process.env.VSCODE_FORWARDING_IS_DEV) {
+ 	}
+-	const cliName = vscode.env.appQuality === 'stable' ? 'code-tunnel' : 'code-tunnel-insiders';
++	const cliName = '!!TUNNEL_APP_NAME!!';
+ 	const extension = process.platform === 'win32' ? '.exe' : '';
