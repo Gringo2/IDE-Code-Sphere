@@ -1,0 +1,58 @@
+{
+    "name": "codesphere-ai-native",
+    "publisher": "codesphere",
+    "version": "0.0.1",
+    "displayName": "CodeSphere AI Native",
+    "description": "Deeply integrated AI capabilities for CodeSphere.",
+    "engines": {
+        "vscode": "^1.90.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "codesphere.ai.helloWorld",
+                "title": "CodeSphere AI: Hello World"
+            }
+        ],
+        "viewContainers": {
+            "activitybar": [
+                {
+                    "id": "codesphere-ai-sidebar",
+                    "title": "CodeSphere AI",
+                    "icon": "$(sparkle)"
+                }
+            ]
+        },
+        "views": {
+            "codesphere-ai-sidebar": [
+                {
+                    "id": "codesphere.ai.chat",
+                    "name": "AI Chat",
+                    "type": "webview"
+                },
+                {
+                    "id": "codesphere.ai.context",
+                    "name": "Context Manager",
+                    "type": "webview"
+                }
+            ]
+        }
+    },
+    "enabledApiProposals": [
+        "inlineCompletionsAdditions",
+        "terminalDataWrite",
+        "chatParticipant",
+        "chatVariableResolver"
+    ],
+    "devDependencies": {
+        "@types/vscode": "1.90.0",
+        "typescript": "^5.4.5"
+    }
+}

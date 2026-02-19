@@ -53,5 +53,21 @@
     "controlUrl": "https://raw.githubusercontent.com/EclipseFdn/publish-extensions/refs/heads/master/extension-control/extensions.json"
   },
   "licenseUrl": "https://github.com/CodeSphere/codesphere-IDE/blob/master/LICENSE",
-  "reportIssueUrl": "https://github.com/CodeSphere/codesphere-IDE/issues/new"
+  "reportIssueUrl": "https://github.com/CodeSphere/codesphere-IDE/issues/new",
+  "extensionAllowedProposedApi": [
+    "codesphere.ai-native"
+  ],
+  "builtInExtensions": [
+    {
+      "name": "codesphere-ai-native",
+      "version": "0.0.1",
+      "id": "codesphere.ai-native"
+    }
+  ],
+  "appInsights": {
+    "instrumentationKey": ""
+  },
+  "appInsightsVortex": {
+    "instrumentationKey": ""
+  }
 }

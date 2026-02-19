@@ -73,8 +73,10 @@ index 93d1631..0533cf0 100644
 +			}
 +		})
  	}
-@@ -57,2 +70,27 @@ export class CommandService extends Disposable implements ICommandService {
- 
+@@ -52,2 +64,27 @@ export class CommandService extends Disposable implements ICommandService {
+ 	async executeCommand<T>(id: string, ...args: unknown[]): Promise<T> {
+ 		this._logService.trace('CommandService#executeCommand', id);
++
 +		const filter = this._commandFilters[id];
 +		if (filter === 'off') {
 +			return Promise.reject(new Error(`command '${id}' not authorized`));
@@ -99,8 +101,7 @@ index 93d1631..0533cf0 100644
 +				return Promise.reject(new Error(`command '${id}' not authorized`));
 +			}
 +		}
-+
- 		if (commandIsRegistered) {
+
 diff --git a/src/vs/workbench/services/commands/test/common/commandService.test.ts b/src/vs/workbench/services/commands/test/common/commandService.test.ts
 index ca3be11..fb456a3 100644
 --- a/src/vs/workbench/services/commands/test/common/commandService.test.ts

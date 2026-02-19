@@ -303,11 +303,12 @@ index 55f1dad..3b7ef5c 100644
 -
  	pub fn env_default() -> Option<Platform> {
 diff --git a/extensions/tunnel-forwarding/src/extension.ts b/extensions/tunnel-forwarding/src/extension.ts
-index 299c728..9fb635d 100644
+index b813735..9fb635d 100644
 --- a/extensions/tunnel-forwarding/src/extension.ts
 +++ b/extensions/tunnel-forwarding/src/extension.ts
-@@ -34,3 +34,3 @@ if (process.env.VSCODE_FORWARDING_IS_DEV) {
- 	}
--	const cliName = vscode.env.appQuality === 'stable' ? 'code-tunnel' : 'code-tunnel-insiders';
-+	const cliName = '!!TUNNEL_APP_NAME!!';
- 	const extension = process.platform === 'win32' ? '.exe' : '';
+@@ -27,3 +27,3 @@ const cliPath = process.env.VSCODE_FORWARDING_IS_DEV
+ 		vscode.env.appRoot,
+ 		process.platform === 'darwin' ? 'bin' : '../../bin',
+-		vscode.env.appQuality === 'stable' ? 'code-tunnel' : 'code-tunnel-insiders',
++		'!!TUNNEL_APP_NAME!!',
+ 	) + (process.platform === 'win32' ? '.exe' : '');

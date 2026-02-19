@@ -11,6 +11,19 @@ fi
 
 cp -f LICENSE vscode/LICENSE.txt
 
+# Bundle custom extensions
+mkdir -p vscode/extensions
+if [[ -d "../extensions" ]]; then
+  echo "Bundling custom extensions..."
+  for ext in ../extensions/*; do
+    if [[ -d "${ext}" ]]; then
+      ext_name=$(basename "${ext}")
+      echo "Copying extension: ${ext_name}"
+      cp -rp "${ext}" "vscode/extensions/${ext_name}"
+    fi
+  done
+fi
+
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
 { set +x; } 2>/dev/null
