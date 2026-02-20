@@ -303,10 +303,9 @@ index 55f1dad..3b7ef5c 100644
 -
  	pub fn env_default() -> Option<Platform> {
 diff --git a/extensions/tunnel-forwarding/src/extension.ts b/extensions/tunnel-forwarding/src/extension.ts
-index b813735..9fb635d 100644
 --- a/extensions/tunnel-forwarding/src/extension.ts
 +++ b/extensions/tunnel-forwarding/src/extension.ts
-@@ -27,3 +27,3 @@ const cliPath = process.env.VSCODE_FORWARDING_IS_DEV
+@@ -27,4 +27,4 @@ const cliPath = process.env.VSCODE_FORWARDING_IS_DEV
  		vscode.env.appRoot,
  		process.platform === 'darwin' ? 'bin' : '../../bin',
 -		vscode.env.appQuality === 'stable' ? 'code-tunnel' : 'code-tunnel-insiders',
