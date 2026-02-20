@@ -71,7 +71,7 @@ diff --git a/src/vs/workbench/services/commands/common/commandService.ts b/src/v
 +			}
 +		})
  	}
-@@ -52,2 +64,27 @@ export class CommandService extends Disposable implements ICommandService {
+@@ -52,3 +64,28 @@ export class CommandService extends Disposable implements ICommandService {
  	async executeCommand<T>(id: string, ...args: unknown[]): Promise<T> {
  		this._logService.trace('CommandService#executeCommand', id);
 +
