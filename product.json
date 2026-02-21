@@ -55,13 +55,13 @@
   "licenseUrl": "https://github.com/CodeSphere/codesphere-IDE/blob/master/LICENSE",
   "reportIssueUrl": "https://github.com/CodeSphere/codesphere-IDE/issues/new",
   "extensionAllowedProposedApi": [
-    "codesphere.ai-native"
+    "codesphere.codesphere-ai-native"
   ],
   "builtInExtensions": [
     {
       "name": "codesphere-ai-native",
       "version": "0.0.1",
-      "id": "codesphere.ai-native"
+      "id": "codesphere.codesphere-ai-native"
     }
   ],
   "appInsights": {
