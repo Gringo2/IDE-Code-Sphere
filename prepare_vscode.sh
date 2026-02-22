@@ -130,12 +130,19 @@ else
   setpath "product" "win32ContextMenu.arm64.clsid" "4852FC55-4A84-4EA1-9C86-D53BE3DF83C0"
 fi
 
-setpath_json "product" "tunnelApplicationConfig" '{}'
-
-jsonTmp=$( jq -s '.[0] * .[1]' product.json ../product.json )
+echo "Merging product.json with root configuration..."
+# Use a safer merge strategy for arrays to avoid wiping out VS Code's default extensions/permissions
+jsonTmp=$( jq -s '
+  .[0] as $base | .[1] as $extra |
+  $base * $extra |
+  .builtInExtensions = ($base.builtInExtensions // [] + ($extra.builtInExtensions // [])) |
+  .extensionAllowedProposedApi = ($base.extensionAllowedProposedApi // [] + ($extra.extensionAllowedProposedApi // [])) |
+  .extensionAllowedBadgeProviders = ($base.extensionAllowedBadgeProviders // [] + ($extra.extensionAllowedBadgeProviders // []))
+' product.json ../product.json )
 echo "${jsonTmp}" > product.json && unset jsonTmp
 
-cat product.json
+echo "Final product.json contents (partial):"
+jq '{builtInExtensions: .builtInExtensions, extensionAllowedProposedApi: .extensionAllowedProposedApi}' product.json
 # }}}
 
 # include common functions
