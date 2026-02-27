@@ -1,0 +1,119 @@
+﻿
+> webview-ui@0.0.0 build
+> vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 3 modules transformed.
+node.exe : 
+[31mΓ£ù[39m Build 
+failed in 841ms
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([31mΓ£ù[39m   
+  Build failed in 8    
+41ms:String) [], R    
+emoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[31merror during 
+build:
+[31m[vite:css] 
+[postcss] Unexpected 
+token, expected ";" 
+(8:2)[31m
+file: [36mC:/Users/job
+sb/Desktop/codesphere-I
+DE/extensions/codespher
+e-ai-native/webview-ui/
+src/index.css:undefined
+:NaN[31m
+    at unexpected (C:\U
+sers\jobsb\Desktop\code
+sphere-IDE\extensions\c
+odesphere-ai-native\web
+view-ui\node_modules\su
+crase\dist\parser\trave
+rser\util.js:99:15)
+    at semicolon (C:\Us
+ers\jobsb\Desktop\codes
+phere-IDE\extensions\co
+desphere-ai-native\webv
+iew-ui\node_modules\suc
+rase\dist\parser\traver
+ser\util.js:77:5)
+    at parseExportDefau
+ltExpression (C:\Users\
+jobsb\Desktop\codespher
+e-IDE\extensions\codesp
+here-ai-native\webview-
+ui\node_modules\sucrase
+\dist\parser\traverser\
+statement.js:1025:21)
+    at parseExport (C:\
+Users\jobsb\Desktop\cod
+esphere-IDE\extensions\
+codesphere-ai-native\we
+bview-ui\node_modules\s
+ucrase\dist\parser\trav
+erser\statement.js:988:
+5)
+    at 
+parseStatementContent (
+C:\Users\jobsb\Desktop\
+codesphere-IDE\extensio
+ns\codesphere-ai-native
+\webview-ui\node_module
+s\sucrase\dist\parser\t
+raverser\statement.js:2
+00:9)
+    at parseStatement (
+C:\Users\jobsb\Desktop\
+codesphere-IDE\extensio
+ns\codesphere-ai-native
+\webview-ui\node_module
+s\sucrase\dist\parser\t
+raverser\statement.js:1
+16:3)
+    at parseBlockBody (
+C:\Users\jobsb\Desktop\
+codesphere-IDE\extensio
+ns\codesphere-ai-native
+\webview-ui\node_module
+s\sucrase\dist\parser\t
+raverser\statement.js:5
+86:5)
+    at parseTopLevel (C
+:\Users\jobsb\Desktop\c
+odesphere-IDE\extension
+s\codesphere-ai-native\
+webview-ui\node_modules
+\sucrase\dist\parser\tr
+averser\statement.js:92
+:3)
+    at parseFile (C:\Us
+ers\jobsb\Desktop\codes
+phere-IDE\extensions\co
+desphere-ai-native\webv
+iew-ui\node_modules\suc
+rase\dist\parser\traver
+ser\index.js:17:35)
+    at parse (C:\Users\
+jobsb\Desktop\codespher
+e-IDE\extensions\codesp
+here-ai-native\webview-
+ui\node_modules\sucrase
+\dist\parser\index.js:2
+6:35)[39m

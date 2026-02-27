@@ -1,13 +1,21 @@
 import * as vscode from 'vscode';
+import { SidebarProvider } from './SidebarProvider';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('CodeSphere AI Native extension is now active!');
+    const sidebarProvider = new SidebarProvider(context.extensionUri);
 
-    let disposable = vscode.commands.registerCommand('codesphere.ai.helloWorld', () => {
-        vscode.window.showInformationMessage('Hello from CodeSphere AI Native!');
-    });
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+            SidebarProvider.viewType,
+            sidebarProvider
+        )
+    );
 
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(
+        vscode.commands.registerCommand('codesphere.ai.helloWorld', () => {
+            vscode.commands.executeCommand('codesphere.ai.chat.focus');
+        })
+    );
 }
 
 export function deactivate() { }
