@@ -27,6 +27,13 @@ if [[ -d "extensions" ]]; then
       popd
       echo "Copying extension: ${ext_name}"
       cp -rp "${ext}" "vscode/extensions/${ext_name}"
+      
+      # Clean up massive node_modules to prevent EMFILE during VS Code build
+      # Since we bundle via esbuild and Vite, we don't need these at runtime.
+      echo "Cleaning up node_modules for ${ext_name}..."
+      rm -rf "vscode/extensions/${ext_name}/node_modules"
+      # Clean up nested node_modules (e.g. for React webviews)
+      find "vscode/extensions/${ext_name}" -name "node_modules" -type d -exec rm -rf {} +
     fi
   done
 fi
