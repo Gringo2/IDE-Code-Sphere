@@ -13,11 +13,18 @@ cp -f LICENSE vscode/LICENSE.txt
 
 # Bundle custom extensions
 mkdir -p vscode/extensions
-if [[ -d "../extensions" ]]; then
+if [[ -d "extensions" ]]; then
   echo "Bundling custom extensions..."
-  for ext in ../extensions/*; do
+  for ext in extensions/*; do
     if [[ -d "${ext}" ]]; then
       ext_name=$(basename "${ext}")
+      echo "Building extension: ${ext_name}"
+      pushd "${ext}"
+      npm install
+      if npm run | grep -q '^[[:space:]]*package$'; then
+        npm run package
+      fi
+      popd
       echo "Copying extension: ${ext_name}"
       cp -rp "${ext}" "vscode/extensions/${ext_name}"
     fi
