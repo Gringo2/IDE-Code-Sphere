@@ -1,5 +1,20 @@
 export const PROTOCOL_VERSION = '1.0.0';
 
+export type RuntimeRole = 'host' | 'daemon' | 'ui';
+
+export interface RuntimeContract {
+    protocolVersion: string;
+    identity: {
+        name: string;
+        role: RuntimeRole;
+    };
+    capabilities: {
+        chat: 'none' | 'basic' | 'streaming';
+        indexing: 'none' | 'deterministic' | 'full';
+        terminal: 'read' | 'read-write' | 'none';
+    };
+}
+
 export interface ChatMessage {
     id: string;
     role: 'user' | 'assistant' | 'system';
@@ -16,8 +31,14 @@ export interface ChatDelta {
 
 export interface ContextItem {
     uri: string;
-    type: 'file' | 'folder' | 'selection';
     content?: string;
+    type: 'file' | 'symbol' | 'snippet';
+    version?: string;
+}
+
+export interface NegotiationMessage {
+    contract: RuntimeContract;
+    timestamp: number;
 }
 
 export type CodeSphereEvent = 

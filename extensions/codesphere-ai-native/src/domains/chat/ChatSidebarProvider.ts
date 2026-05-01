@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { globalEventBus } from '../../core/EventBus';
-import { AiService } from './AiService';
+import { AiService } from './ai-service';
 import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
 
 export class ChatSidebarProvider implements vscode.WebviewViewProvider {

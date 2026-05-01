@@ -173,6 +173,10 @@ echo "GLOBAL_DIRNAME=\"${GLOBAL_DIRNAME}\""
 echo "ORG_NAME=\"${ORG_NAME}\""
 echo "TUNNEL_APP_NAME=\"${TUNNEL_APP_NAME}\""
 
+# Run UPCM Patch Validation
+echo "Running Patch Validator (Pre-flight)..."
+ts-node ../scripts/validate_patches.ts || { echo "Patch validation failed. Aborting build."; exit 1; }
+
 if [[ "${DISABLE_UPDATE}" == "yes" ]]; then
   mv ../patches/core/disable-update.patch.yet ../patches/core/disable-update.patch 2>/dev/null || true
 fi

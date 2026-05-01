@@ -8,7 +8,7 @@ export class AiService {
         console.log(`[AiService] Handling chat/send: ${text}`);
 
         try {
-            console.log(`[AiService] Would call daemon at ${this.DAEMON_URL} with v${PROTOCOL_VERSION}`);
+            console.log(`[AiService] Would call daemon at ${AiService.DAEMON_URL} with v${PROTOCOL_VERSION}`);
         } catch (e) {
             console.error(`[AiService] Daemon unreachable, using internal fallback`);
         }

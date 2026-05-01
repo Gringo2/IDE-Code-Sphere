@@ -43,3 +43,10 @@ yarn-debug.log*
 yarn-error.log*
 .eslintcache
 .stylelintcache
+
+# Governance Observability (GOS)
+*.trace.json
+/gos-cache/
+/runtime-traces/
+/event-buffer.json
+/debug-traces/
