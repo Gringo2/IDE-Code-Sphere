@@ -35,12 +35,14 @@
                 {
                     "id": "codesphere.ai.chat",
                     "name": "AI Chat",
-                    "type": "webview"
+                    "type": "webview",
+                    "icon": "$(comment-discussion)"
                 },
                 {
                     "id": "codesphere.ai.context",
                     "name": "Context Manager",
-                    "type": "webview"
+                    "type": "webview",
+                    "icon": "$(references)"
                 }
             ]
         }
@@ -57,22 +59,30 @@
         "pretest": "npm run compile-tests && npm run compile && npm run lint",
         "check-types": "tsc --noEmit",
         "lint": "eslint src --ext ts",
+        "test:unit": "mocha -r ts-node/register src/__tests__/**/*.test.ts",
         "build:webview": "cd webview-ui && npm install && npm run build"
     },
     "enabledApiProposals": [
         "inlineCompletionsAdditions",
-        "terminalDataWrite",
-        "chatParticipant",
-        "chatVariableResolver"
+        "terminalDataWriteEvent"
     ],
     "devDependencies": {
+        "@types/chai": "^5.2.3",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.10",
         "@types/node": "18.x",
         "@types/vscode": "1.90.0",
         "@typescript-eslint/eslint-plugin": "^7.11.0",
         "@typescript-eslint/parser": "^7.11.0",
+        "@vscode/test-electron": "^2.5.2",
+        "chai": "^6.2.2",
         "esbuild": "^0.21.5",
         "eslint": "^8.57.0",
+        "glob": "^13.0.6",
+        "mocha": "^11.7.5",
+        "mocha-multi-reporters": "^1.5.1",
         "npm-run-all": "^4.1.5",
+        "ts-node": "^10.9.2",
         "typescript": "^5.4.5"
     }
 }

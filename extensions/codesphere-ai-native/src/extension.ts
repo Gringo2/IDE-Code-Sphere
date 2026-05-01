@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { SidebarProvider } from './SidebarProvider';
+import { ContextProvider } from './ContextProvider';
 
 export function activate(context: vscode.ExtensionContext) {
     const sidebarProvider = new SidebarProvider(context.extensionUri);
@@ -8,6 +9,14 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.registerWebviewViewProvider(
             SidebarProvider.viewType,
             sidebarProvider
+        )
+    );
+
+    const contextProvider = new ContextProvider(context.extensionUri);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider(
+            ContextProvider.viewType,
+            contextProvider
         )
     );
 
