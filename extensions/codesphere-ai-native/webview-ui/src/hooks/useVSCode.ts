@@ -3,10 +3,11 @@
  */
 export function useVSCode() {
     const vscode = (window as any).acquireVsCodeApi?.();
+    const version = (window as any).protocolVersion || '0.0.0';
     
     const postMessage = (topic: string, data?: any) => {
-        vscode?.postMessage({ topic, data });
+        vscode?.postMessage({ topic, data: { ...data, version } });
     };
 
-    return { postMessage };
+    return { postMessage, version };
 }

@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { globalEventBus } from './core/EventBus';
-import { ContextItem } from './types/protocol';
+import { globalEventBus } from '../../core/EventBus';
+import { AiService } from './AiService';
+import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
 
-export class ContextProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'codesphere.ai.context';
+export class ChatSidebarProvider implements vscode.WebviewViewProvider {
+    public static readonly viewType = 'codesphere.ai.chat';
 
     constructor(private readonly _extensionUri: vscode.Uri) { }
 
@@ -21,26 +22,30 @@ export class ContextProvider implements vscode.WebviewViewProvider {
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(message => {
+            console.log(`[ChatSidebarProvider] Received message from webview:`, message);
             if (message.topic) {
-                globalEventBus.emit(message.topic, message.data);
+                globalEventBus.emit(message.topic, { ...message.data, version: PROTOCOL_VERSION });
             }
         });
 
-        // Listen for context updates to send to UI
-        const contextListener = (data: ContextItem) => {
-            webviewView.webview.postMessage({ topic: 'context/update', data });
+        // Listen for internal events to send back to webview
+        const chatDeltaListener = (data: ChatDelta) => {
+            webviewView.webview.postMessage({ topic: 'chat/delta', data: { ...data, version: PROTOCOL_VERSION } });
         };
 
-        globalEventBus.on('context/add', contextListener);
+        globalEventBus.on('chat/delta', chatDeltaListener);
+
+        // Wire up AiService to listen for chat/send
+        globalEventBus.on('chat/send', (data: { text: string }) => {
+            AiService.handleChatSend(data.text);
+        });
 
         webviewView.onDidDispose(() => {
-            globalEventBus.off('context/add', contextListener);
+            globalEventBus.off('chat/delta', chatDeltaListener);
         });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        // We'll reuse the same compiled React app but with a different routing/entry if needed
-        // For now, let's assume the same App.tsx handles context via conditional rendering or routing
         const scriptUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'build', 'assets', 'index.js')
         );
@@ -57,12 +62,13 @@ export class ContextProvider implements vscode.WebviewViewProvider {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
     <link href="${styleUri}" rel="stylesheet">
-    <title>CodeSphere Context</title>
+    <title>CodeSphere AI</title>
   </head>
   <body>
     <div id="root"></div>
     <script nonce="${nonce}">
-      window.viewType = "${ContextProvider.viewType}";
+      window.viewType = "${ChatSidebarProvider.viewType}";
+      window.protocolVersion = "${PROTOCOL_VERSION}";
     </script>
     <script nonce="${nonce}" type="module" src="${scriptUri}"></script>
   </body>

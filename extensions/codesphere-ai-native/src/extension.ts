@@ -1,21 +1,21 @@
 import * as vscode from 'vscode';
-import { SidebarProvider } from './SidebarProvider';
-import { ContextProvider } from './ContextProvider';
+import { ChatSidebarProvider } from './domains/chat/ChatSidebarProvider';
+import { ContextSidebarProvider } from './domains/context/ContextSidebarProvider';
 
 export function activate(context: vscode.ExtensionContext) {
-    const sidebarProvider = new SidebarProvider(context.extensionUri);
+    const chatProvider = new ChatSidebarProvider(context.extensionUri);
 
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
-            SidebarProvider.viewType,
-            sidebarProvider
+            ChatSidebarProvider.viewType,
+            chatProvider
         )
     );
 
-    const contextProvider = new ContextProvider(context.extensionUri);
+    const contextProvider = new ContextSidebarProvider(context.extensionUri);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
-            ContextProvider.viewType,
+            ContextSidebarProvider.viewType,
             contextProvider
         )
     );

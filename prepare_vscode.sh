@@ -174,12 +174,20 @@ echo "ORG_NAME=\"${ORG_NAME}\""
 echo "TUNNEL_APP_NAME=\"${TUNNEL_APP_NAME}\""
 
 if [[ "${DISABLE_UPDATE}" == "yes" ]]; then
-  mv ../patches/disable-update.patch.yet ../patches/disable-update.patch
+  mv ../patches/core/disable-update.patch.yet ../patches/core/disable-update.patch 2>/dev/null || true
 fi
 
-for file in ../patches/*.patch; do
-  if [[ -f "${file}" ]]; then
-    apply_patch "${file}"
+# Apply semantic patch classes in order
+PATCH_CLASSES=("core" "branding" "feat" "ai")
+
+for class in "${PATCH_CLASSES[@]}"; do
+  echo "Applying patch class: ${class}"
+  if [[ -d "../patches/${class}" ]]; then
+    for file in "../patches/${class}/"*.patch; do
+      if [[ -f "${file}" ]]; then
+        apply_patch "${file}"
+      fi
+    done
   fi
 done
 

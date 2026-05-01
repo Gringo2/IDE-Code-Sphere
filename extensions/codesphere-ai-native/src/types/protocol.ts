@@ -1,3 +1,5 @@
+export const PROTOCOL_VERSION = '1.0.0';
+
 export interface ChatMessage {
     id: string;
     role: 'user' | 'assistant' | 'system';
@@ -9,6 +11,7 @@ export interface ChatDelta {
     id: string;
     delta: string;
     done?: boolean;
+    version?: string;
 }
 
 export interface ContextItem {

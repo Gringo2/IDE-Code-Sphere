@@ -1,6 +1,11 @@
-# CodeSphere Daemon Protocol (v1.0)
+# CodeSphere Daemon Protocol (v1.0.0)
 
 This document defines the JSON-RPC 2.0 protocol for communication between the CodeSphere IDE (Extension Host) and the Native AI Runtime (Daemon).
+
+## 🛡️ Protocol Invariants
+- **Version Awareness**: All messages MUST include a `version` string (e.g., `"1.0.0"`).
+- **Domain Separation**: Requests are namespaced by domain (chat, context, index, sys).
+- **Layer Integrity**: Deterministic (Symbol Graph) and Probabilistic (Embeddings) results must be returned in separate fields to allow the Host to weight them differently.
 
 ## Transport
 - **Default**: WebSocket (`ws://localhost:PORT`)
@@ -37,15 +42,16 @@ Cancels the current generation.
 
 ---
 
-## 🗂️ Context API
+## 🗂️ Context & Indexing API
 
-### `context/indexWorkspace`
-Triggers the daemon to build/update the semantic index.
-- **Params**: `workspacePath`: string.
+### `index/deterministic` (Symbol Graph)
+Builds/queries the deterministic AST-based symbol graph.
+- **Method**: `index/getSymbols`
+- **Result**: `Array<{ symbol: string, type: string, location: Range }>`
 
-### `context/query`
-Semantic search across the codebase.
-- **Params**: `query`: string.
+### `index/probabilistic` (Embeddings)
+Semantic search across the codebase using vector similarity.
+- **Method**: `index/searchSemantic`
 - **Result**: `Array<{ path: string, snippet: string, score: number }>`
 
 ---
