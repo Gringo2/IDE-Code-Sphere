@@ -8,6 +8,8 @@ Welcome to the internal design documentation for **CodeSphere IDE**. This reposi
 *   **[System Design](system_design.md)**: High-level goals, core principles, and rebranded identity.
 *   **[Architecture](architecture.md)**: Deep dive into the repository structure, build scripts, and the build process logic.
 *   **[Diagrams](diagrams.md)**: Visual representations of the build system and component interactions.
+*   **[AI Native Research Plan](ai-native-research-plan.md)**: Research spike plan for the built-in AI extension, daemon boundary, context system, and MVP workflow.
+*   **[AI Native Event Contract](event-contract.md)**: Canonical internal event topics, domains, payloads, and current drift.
 
 ## Project Overview
 

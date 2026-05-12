@@ -58,4 +58,6 @@ nav:
       - System Design: design/system_design.md
       - Architecture: design/architecture.md
       - CI/CD Architecture: design/ci-cd-architecture.md
+      - AI Native Research Plan: design/ai-native-research-plan.md
+      - AI Native Event Contract: design/event-contract.md
       - Diagrams: design/diagrams.md
