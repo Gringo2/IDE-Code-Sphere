@@ -40,6 +40,28 @@ export const EventRegistry: Record<string, EventContract> = {
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
+    'context/add': {
+        topic: 'context/add',
+        owner: 'context',
+        allowedEmitters: ['ui', 'host'],
+        schema: z.object({
+            uri: z.string(),
+            content: z.string().optional(),
+            type: z.enum(['file', 'symbol', 'snippet']),
+            version: z.string().default(PROTOCOL_VERSION)
+        })
+    },
+    'context/update': {
+        topic: 'context/update',
+        owner: 'context',
+        allowedEmitters: ['context', 'host'],
+        schema: z.object({
+            uri: z.string(),
+            content: z.string().optional(),
+            type: z.enum(['file', 'symbol', 'snippet']),
+            version: z.string().default(PROTOCOL_VERSION)
+        })
+    },
     'sys/negotiate': {
         topic: 'sys/negotiate',
         owner: 'sys',

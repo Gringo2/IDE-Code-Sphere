@@ -5,8 +5,14 @@ import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
 
 export class ChatSidebarProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'codesphere.ai.chat';
+    private readonly _aiService: AiService;
 
-    constructor(private readonly _extensionUri: vscode.Uri) { }
+    constructor(
+        private readonly _extensionUri: vscode.Uri,
+        secrets: vscode.SecretStorage
+    ) {
+        this._aiService = new AiService(secrets);
+    }
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -24,7 +30,7 @@ export class ChatSidebarProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(message => {
             console.log(`[ChatSidebarProvider] Received message from webview:`, message);
             if (message.topic) {
-                globalEventBus.emit(message.topic, { ...message.data, version: PROTOCOL_VERSION });
+                globalEventBus.emit(message.topic, { ...message.data, version: PROTOCOL_VERSION }, 'ui');
             }
         });
 
@@ -36,12 +42,15 @@ export class ChatSidebarProvider implements vscode.WebviewViewProvider {
         globalEventBus.on('chat/delta', chatDeltaListener);
 
         // Wire up AiService to listen for chat/send
-        globalEventBus.on('chat/send', (data: { text: string }) => {
-            AiService.handleChatSend(data.text);
-        });
+        const chatSendListener = (data: { text: string }) => {
+            this._aiService.handleChatSend(data.text);
+        };
+
+        globalEventBus.on('chat/send', chatSendListener);
 
         webviewView.onDidDispose(() => {
             globalEventBus.off('chat/delta', chatDeltaListener);
+            globalEventBus.off('chat/send', chatSendListener);
         });
     }
 

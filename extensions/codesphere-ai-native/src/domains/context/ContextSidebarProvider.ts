@@ -22,7 +22,7 @@ export class ContextSidebarProvider implements vscode.WebviewViewProvider {
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(message => {
             if (message.topic) {
-                globalEventBus.emit(message.topic, { ...message.data, version: PROTOCOL_VERSION });
+                globalEventBus.emit(message.topic, { ...message.data, version: PROTOCOL_VERSION }, 'ui');
             }
         });
 

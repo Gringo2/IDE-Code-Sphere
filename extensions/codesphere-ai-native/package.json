@@ -19,8 +19,22 @@
             {
                 "command": "codesphere.ai.helloWorld",
                 "title": "CodeSphere AI: Hello World"
+            },
+            {
+                "command": "codesphere.ai.setOpenRouterKey",
+                "title": "CodeSphere AI: Set OpenRouter API Key"
             }
         ],
+        "configuration": {
+            "title": "CodeSphere AI",
+            "properties": {
+                "codesphere.ai.openRouterModel": {
+                    "type": "string",
+                    "default": "openai/gpt-oss-120b",
+                    "description": "OpenRouter model id used by CodeSphere AI chat."
+                }
+            }
+        },
         "viewContainers": {
             "activitybar": [
                 {
