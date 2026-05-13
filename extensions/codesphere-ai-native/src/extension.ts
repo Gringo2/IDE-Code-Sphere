@@ -2,10 +2,29 @@ import * as vscode from 'vscode';
 import { ChatSidebarProvider } from './domains/chat/ChatSidebarProvider';
 import { ContextSidebarProvider } from './domains/context/ContextSidebarProvider';
 import { ContextService } from './domains/context/context-service';
+import { EventBus, RuntimeMode } from './core/EventBus';
 
 export const OPENROUTER_CONSENT_KEY = 'codesphere.ai.openRouterConsent.v1';
 
+function toRuntimeMode(mode: vscode.ExtensionMode): RuntimeMode {
+    switch (mode) {
+        case vscode.ExtensionMode.Production: return RuntimeMode.Production;
+        case vscode.ExtensionMode.Development: return RuntimeMode.Development;
+        case vscode.ExtensionMode.Test: return RuntimeMode.Test;
+        default: return RuntimeMode.Production;
+    }
+}
+
 export function activate(context: vscode.ExtensionContext) {
+    // GVF bootstrap boundary per docs/design/gvf.md §5 + §9.
+    // EventBus mode is set once, here, and immutable thereafter (Test mode
+    // forbids re-entry). CODESPHERE_GOVERNANCE_STRICT=1 escalates Development
+    // to throw-on-violation; Production never honors the override.
+    EventBus.configure({
+        mode: toRuntimeMode(context.extensionMode),
+        strictOverride: process.env.CODESPHERE_GOVERNANCE_STRICT === '1'
+    });
+
     const contextService = new ContextService();
     context.subscriptions.push(contextService);
 
