@@ -7,20 +7,29 @@ export class AiService {
 
     constructor(private readonly secrets: vscode.SecretStorage) { }
 
-    public async handleChatSend(text: string): Promise<void> {
-        console.log(`[AiService] Handling chat/send: ${text}`);
+    public async handleChatSend(text: string, signal?: AbortSignal): Promise<void> {
+        const messageId = Math.random().toString(36).substring(7);
+        console.log(`[AiService] chat/send id=${messageId} text=${text.slice(0, 80)}`);
 
         try {
-            const content = await this.createOpenRouterCompletion(text);
-            await this.emitStreamingResponse(content);
+            await this.streamOpenRouterCompletion(text, messageId, signal);
         } catch (e) {
+            if (signal?.aborted) {
+                console.log(`[AiService] stream aborted id=${messageId}`);
+                this.emitDelta(messageId, '', true);
+                return;
+            }
             const message = e instanceof Error ? e.message : String(e);
             console.error(`[AiService] OpenRouter request failed: ${message}`);
-            await this.emitStreamingResponse(`OpenRouter request failed: ${message}`);
+            this.emitDelta(messageId, `OpenRouter request failed: ${message}`, true);
         }
     }
 
-    private async createOpenRouterCompletion(text: string): Promise<string> {
+    private async streamOpenRouterCompletion(
+        text: string,
+        messageId: string,
+        signal?: AbortSignal
+    ): Promise<void> {
         const apiKey = await this.getOpenRouterApiKey();
         if (!apiKey) {
             throw new Error('No OpenRouter API key is configured. Run "CodeSphere AI: Set OpenRouter API Key" from the command palette.');
@@ -32,6 +41,7 @@ export class AiService {
 
         const response = await fetch(AiService.OPENROUTER_URL, {
             method: 'POST',
+            signal,
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
@@ -51,7 +61,7 @@ export class AiService {
                     }
                 ],
                 temperature: 0.7,
-                stream: false
+                stream: true
             })
         });
 
@@ -59,42 +69,72 @@ export class AiService {
             const errorText = await response.text();
             throw new Error(`OpenRouter returned ${response.status}: ${errorText.slice(0, 300)}`);
         }
-
-        const payload = await response.json() as {
-            choices?: Array<{
-                message?: {
-                    content?: string;
-                };
-            }>;
-        };
-
-        const content = payload.choices?.[0]?.message?.content?.trim();
-        if (!content) {
-            throw new Error('OpenRouter returned an empty response.');
+        if (!response.body) {
+            throw new Error('OpenRouter returned no response body.');
         }
 
-        return content;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let received = 0;
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                buffer += decoder.decode(value, { stream: true });
+
+                let idx: number;
+                while ((idx = buffer.indexOf('\n\n')) >= 0) {
+                    const event = buffer.slice(0, idx);
+                    buffer = buffer.slice(idx + 2);
+
+                    if (!event.startsWith('data:')) {
+                        continue;
+                    }
+                    const payload = event.slice(5).trim();
+                    if (payload === '[DONE]') {
+                        this.emitDelta(messageId, '', true);
+                        return;
+                    }
+                    try {
+                        const json = JSON.parse(payload);
+                        const delta = json?.choices?.[0]?.delta?.content;
+                        if (typeof delta === 'string' && delta.length > 0) {
+                            received += delta.length;
+                            this.emitDelta(messageId, delta, false);
+                        }
+                    } catch {
+                        // Skip malformed SSE chunks; the stream may include keep-alives.
+                    }
+                }
+            }
+        } finally {
+            try { reader.releaseLock(); } catch { /* already released */ }
+        }
+
+        // Stream closed without an explicit [DONE]. Emit a terminal delta so the UI
+        // can flip out of the streaming state.
+        if (received > 0) {
+            this.emitDelta(messageId, '', true);
+        } else {
+            throw new Error('OpenRouter returned an empty stream.');
+        }
+    }
+
+    private emitDelta(id: string, delta: string, done: boolean): void {
+        const event: ChatDelta = {
+            id,
+            delta,
+            done,
+            version: PROTOCOL_VERSION
+        };
+        globalEventBus.emit('chat/delta', event, 'chat');
     }
 
     private async getOpenRouterApiKey(): Promise<string | undefined> {
         return await this.secrets.get('codesphere.openRouterApiKey') || process.env.OPENROUTER_API_KEY;
-    }
-
-    private async emitStreamingResponse(content: string): Promise<void> {
-        const messageId = Math.random().toString(36).substring(7);
-        const words = content.split(/(\s+)/).filter(Boolean);
-
-        for (let i = 0; i < words.length; i++) {
-            await new Promise(resolve => setTimeout(resolve, 15));
-            
-            const delta: ChatDelta = {
-                id: messageId,
-                delta: words[i],
-                done: i === words.length - 1,
-                version: PROTOCOL_VERSION
-            };
-
-            globalEventBus.emit('chat/delta', delta, 'chat');
-        }
     }
 }

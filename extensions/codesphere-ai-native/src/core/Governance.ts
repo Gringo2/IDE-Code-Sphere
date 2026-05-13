@@ -40,6 +40,15 @@ export const EventRegistry: Record<string, EventContract> = {
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
+    'chat/stop': {
+        topic: 'chat/stop',
+        owner: 'chat',
+        allowedEmitters: ['ui'],
+        schema: z.object({
+            id: z.string().optional(),
+            version: z.string().default(PROTOCOL_VERSION)
+        })
+    },
     'context/add': {
         topic: 'context/add',
         owner: 'context',

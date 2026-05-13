@@ -6,6 +6,7 @@ import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
 export class ChatSidebarProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'codesphere.ai.chat';
     private readonly _aiService: AiService;
+    private _activeStream?: AbortController;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
@@ -41,16 +42,34 @@ export class ChatSidebarProvider implements vscode.WebviewViewProvider {
 
         globalEventBus.on('chat/delta', chatDeltaListener);
 
-        // Wire up AiService to listen for chat/send
+        // Wire up AiService to listen for chat/send. Each send gets its own
+        // AbortController so chat/stop can cancel the in-flight stream.
         const chatSendListener = (data: { text: string }) => {
-            this._aiService.handleChatSend(data.text);
+            this._activeStream?.abort();
+            this._activeStream = new AbortController();
+            const controller = this._activeStream;
+            this._aiService.handleChatSend(data.text, controller.signal)
+                .finally(() => {
+                    if (this._activeStream === controller) {
+                        this._activeStream = undefined;
+                    }
+                });
+        };
+
+        const chatStopListener = () => {
+            this._activeStream?.abort();
+            this._activeStream = undefined;
         };
 
         globalEventBus.on('chat/send', chatSendListener);
+        globalEventBus.on('chat/stop', chatStopListener);
 
         webviewView.onDidDispose(() => {
+            this._activeStream?.abort();
+            this._activeStream = undefined;
             globalEventBus.off('chat/delta', chatDeltaListener);
             globalEventBus.off('chat/send', chatSendListener);
+            globalEventBus.off('chat/stop', chatStopListener);
         });
     }
 

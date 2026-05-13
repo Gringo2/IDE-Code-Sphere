@@ -60,4 +60,34 @@ describe('GovernanceEnforcer', () => {
             expect(violation!.reasonCode).to.equal('UNKNOWN_TOPIC');
         });
     });
+
+    describe('chat/stop', () => {
+        it('accepts chat/stop from ui with an id', () => {
+            const violation = GovernanceEnforcer.validateEmission(
+                'chat/stop',
+                { id: 'abc', version: PROTOCOL_VERSION },
+                'ui'
+            );
+            expect(violation).to.equal(null);
+        });
+
+        it('accepts chat/stop from ui without an id', () => {
+            const violation = GovernanceEnforcer.validateEmission(
+                'chat/stop',
+                { version: PROTOCOL_VERSION },
+                'ui'
+            );
+            expect(violation).to.equal(null);
+        });
+
+        it('rejects chat/stop from chat (only ui may stop)', () => {
+            const violation = GovernanceEnforcer.validateEmission(
+                'chat/stop',
+                { version: PROTOCOL_VERSION },
+                'chat'
+            );
+            expect(violation).to.not.equal(null);
+            expect(violation!.reasonCode).to.equal('UNAUTHORIZED_EMITTER');
+        });
+    });
 });
