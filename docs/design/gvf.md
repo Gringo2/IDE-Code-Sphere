@@ -1,6 +1,6 @@
 # GVF — Governance Verification Framework
 
-**Status:** v0 draft, **pending ratification.** Not authoritative until the project owner signs §1 and §2. Until then, any GVF-shaped code (deepFreeze, temporal invariants, Silent Channel, CausalLink, Panic Model) is interpreted against *this draft*, not against the merged code on `feature/ai-native-core`. When ratified, the code reconciles to this spec — not the other way around.
+**Status:** v1, **authoritative as of 2026-05-14.** Ratified by the project owner. Any GVF-shaped code (`deepFreeze`, temporal invariants, Silent Channel, `CausalLink`, Panic Model) is interpreted against this spec. The uncommitted GVF code in the main worktree reconciles to v1 in PR #4 (forthcoming).
 
 **Companion documents:** [governance-upcm.md](../governance-upcm.md) (event ownership / runtime contracts), [daemon-protocol.md](../daemon-protocol.md) (host ↔ daemon JSON-RPC), [event-contract.md](./event-contract.md) (canonical topic registry).
 
@@ -10,13 +10,19 @@
 
 ## 1. Charter
 
-GVF is a **runtime verification layer** on top of the existing UPCM (event ownership) and GOS (observability) systems. Where UPCM answers *"who is allowed to emit what?"* and GOS answers *"what happened?"*, GVF answers a different question:
+GVF (**Governance Verification Framework**) is a **runtime verification layer** on top of the existing UPCM (event ownership) and GOS (observability) systems. Where UPCM answers *"who is allowed to emit what?"* and GOS answers *"what happened?"*, GVF answers a different question:
 
 > *"Can the answers from UPCM and GOS be trusted?"*
 
 That trust is established by **four constitutional invariants**, each enforced by runtime machinery, type-system constraints, or both. Violations of these invariants are treated as *substrate-level corruption* — qualitatively different from ordinary application errors.
 
 GVF is deliberately small. It does not expand the surface of governance — it makes the existing surface *physically* (not just logically) guaranteed.
+
+### Foundational Principle
+
+> **Invariants must never exceed substrate truth.**
+
+A constitutional invariant is a promise the substrate can mechanically keep. Promising more than the substrate can deliver — typed surfaces that aren't populated, temporal checks that conflate wall-clock with causality, audit channels that can be spoofed — degrades the framework from law to ceremony. This principle is load-bearing: it determines which invariants ship in v1 (Physical Immutability, Replay Boundaries, Recursion Isolation) and which are deferred (Temporal Consistency — see §3.4).
 
 ## 2. Constitutional Scope
 
@@ -76,11 +82,11 @@ if (topic.startsWith('sys/gqi/')) {
 }
 ```
 
-The `emitter !== 'sys'` check is **mandatory**. The Silent Channel is not a convenience optimization — it is a *protected epistemic boundary*. A spoofed emit on `sys/gqi/*` would let a compromised UI or host evade audit, which is exactly the failure mode the channel exists to prevent.
+The `emitter !== 'sys'` check is **mandatory constitutional enforcement** — not optional hardening. The Silent Channel is not a convenience optimization; it is a *protected epistemic boundary*. A spoofed emit on `sys/gqi/*` would let a compromised UI or host evade audit, which is exactly the failure mode the channel exists to prevent. Omitting the check compromises the entire epistemic isolation model.
 
 **Why:** Without recursion isolation, introspecting the system mutates the system's own history. Replay determinism cannot survive recursive observation. Examples of legitimate Silent Channel use: querying the trace store for a debug UI, computing `GovernanceStress` metrics, internal health checks.
 
-**GQI** is provisionally interpreted as "Governance Query Interface." The spec ratifies the term in §11.
+**GQI** is ratified as **Governance Query Interface**.
 
 ### 3.4 Temporal Consistency — DEFERRED
 
@@ -88,15 +94,17 @@ The `emitter !== 'sys'` check is **mandatory**. The Silent Channel is not a conv
 
 **Rationale:** Wall-clock adjacency is not causality. Under concurrent emits across domains (chat streaming `chat/delta` mid-response while the host emits `context/add` on editor switch), two emits with different wall-clock origins can interleave non-monotonically without any causal inversion having occurred. Enforcing wall-clock monotonicity panics on a non-violation — semantically overclaiming.
 
-**Re-introduction conditions:** Temporal Consistency is re-introduced as a *real* invariant once:
+**Re-introduction conditions:** Temporal Consistency is re-introduced as a *real* invariant once *all three* of the following hold:
 
 1. `CausalLink` is *populated* by runtime lineage construction (not just typed).
-2. A causal parent for each trace is identifiable from `causalLinks`.
-3. The invariant restated as: *"For every causal-parent relation (trace P, trace C), C.timestamp ≥ P.timestamp."*
+2. Causal parents for each trace are *authoritative* (not diagnostic).
+3. Replay graph reconstruction is implemented (a trace's causal ancestors can be retrieved deterministically).
 
-Until then, temporal ordering is *diagnostic*, not authoritative. See §6 for what that distinction means.
+The re-introduced invariant is restated as: *"For every causal-parent relation (trace P, trace C), C.timestamp ≥ P.timestamp."* Wall-clock comparison against `TraceStore.getLast()` is **not** the re-introduced check and must not be reused.
 
-**Principle:** *Invariants must never exceed substrate truth.* Typed causality is not implemented causality.
+Until those three conditions hold, **timestamps are diagnostic, not constitutional.** See §6 for the distinction.
+
+**This deferral is a direct application of the Foundational Principle in §1.** Typed causality is not implemented causality.
 
 ## 4. Failure Taxonomy
 
@@ -129,7 +137,11 @@ Three modes. The mode is detected via `vscode.ExtensionContext.extensionMode`, n
 
 **Why this separation:** Constitutional enforcement and operational survivability are independent concerns. In production, the IDE matters more than the audit log. In test, the audit log *is* the contract being verified. Development is the deliberate middle ground.
 
-**The override (`CODESPHERE_GOVERNANCE_STRICT=1`) is no longer a gate; it is an opt-in upgrade.** A developer who wants test-mode strictness in dev sets the flag. The flag does nothing in production (panics are still forbidden there).
+**The override (`CODESPHERE_GOVERNANCE_STRICT=1`) is no longer a gate; it is a Development-mode escalation.** A developer who wants test-mode strictness in dev sets the flag.
+
+**Production never honors the override.** The override has no effect when `extensionMode === ExtensionMode.Production`. Panics are forbidden in production regardless of any environment variable — this is non-negotiable and follows from the operational-stability commitment of Production mode.
+
+**Test mode is unaffected by the override.** Test mode always panics on constitutional violations; the override neither weakens nor strengthens that.
 
 ## 6. Authoritative vs Diagnostic Systems
 
@@ -236,12 +248,17 @@ This spec resolves the conflict as follows.
 
 ## 9. Open Questions
 
-1. **`ExtensionMode` plumbing.** The `EventBus` is a singleton (`getInstance()`). It has no `ExtensionContext` reference. Options: pass `extensionMode` at first use; expose `EventBus.configure(mode)` called from `activate()`; or store mode in a sibling module. Decision: TBD.
-2. **Performance SLA for `deepFreeze` enforcement.** The "< 0.1 ms per emit" claim in §3.1 is asserted but not measured. Need a microbenchmark before relying on it.
-3. **Quarantine semantics in Production.** §4 says "log + quarantine + non-fatal." What does *quarantine* mean operationally? Options: trace is recorded with `status: 'corrupted'`; subsequent reads filter it out; daemon is notified out-of-band. Decision: TBD.
-4. **`CausalLink` construction.** Required for §3.4 re-introduction. Open: who is responsible for declaring causal parentage — the emitter, the EventBus, or a separate scheduler?
-5. **GQI initialism.** Provisionally "Governance Query Interface." Ratify or revise in §11.
-6. **GVF initialism.** Provisionally "Governance Verification Framework." Ratify or revise in §11.
+### Resolved at v1
+
+- ✅ **GVF initialism.** Ratified as **Governance Verification Framework**.
+- ✅ **GQI initialism.** Ratified as **Governance Query Interface**.
+- ✅ **`ExtensionMode` plumbing.** Adopted pattern: `EventBus.configure({ extensionMode, strictOverride })` called once from `activate()`. No hidden globals, no env probing deep in runtime code, no implicit singleton mutation. Mode is set explicitly at the bootstrap boundary and is immutable thereafter. Re-entering `configure()` after the first call is itself a constitutional violation in Test mode.
+
+### Deferred to v0.1 (not blocking PR #4)
+
+- **Performance SLA for `deepFreeze` enforcement.** The "< 0.1 ms per emit" claim in §3.1 is asserted but not measured. A microbenchmark is required before §3.1's performance contract is treated as load-bearing. Until measured, it is diagnostic guidance.
+- **Quarantine semantics in Production.** §4 says "log + quarantine + non-fatal." What does *quarantine* mean operationally? Candidate behaviors: trace recorded with `status: 'corrupted'`; subsequent reads filter it out; daemon notified out-of-band. To be specified before the daemon ships (P2).
+- **`CausalLink` construction.** Required for §3.4 Temporal Consistency re-introduction. Open: who declares causal parentage — the emitter, the EventBus, or a separate scheduler? To be specified before any temporal-aware feature is built.
 
 ## 10. Non-Goals
 
@@ -254,25 +271,66 @@ GVF is explicitly NOT trying to:
 - **Define a permissions model.** Who is allowed to *call* the EventBus is out of scope. UPCM defines who is allowed to *emit on a topic*. Those are different and GVF doesn't conflate them.
 - **Enforce semantic content correctness.** A `chat/send` payload with `text: 'malicious prompt injection'` is governance-clean. GVF does not adjudicate prompt content.
 
-## 11. Ratification Checklist
+## 11. Ratification Checklist — closed
 
-Before this draft becomes v1 (authoritative):
+All boxes signed as of 2026-05-14. Subsequent changes to v1 follow the §12 revision process.
 
-- [ ] §1 Charter reviewed and rewritten in the project owner's voice.
-- [ ] §2 Constitutional Scope confirmed — additions / removals.
-- [ ] GVF initialism ratified (currently provisional: "Governance Verification Framework").
-- [ ] GQI initialism ratified (currently provisional: "Governance Query Interface").
-- [ ] §5 mode table confirmed — `ExtensionMode` mapping, override semantics.
-- [ ] §8 migration plan approved as the path forward for the conflicting code.
-- [ ] §9 open questions assigned owners or explicitly deferred to v0.1.
-- [ ] At least one tester unrelated to authorship has read the spec end-to-end and confirms it reads as a coherent document, not as scaffolding.
+- [x] §1 Charter — confirmed.
+- [x] §2 Constitutional Scope — confirmed.
+- [x] GVF initialism — ratified as Governance Verification Framework.
+- [x] GQI initialism — ratified as Governance Query Interface.
+- [x] §5 mode table — confirmed. `ExtensionMode` mapping authoritative. `CODESPHERE_GOVERNANCE_STRICT=1` is Development-only escalation, never honored in Production.
+- [x] §8 migration plan — approved.
+- [x] §9 open questions — three resolved, three explicitly deferred to v0.1 with non-blocking status.
+- [x] Independent read — owner review affirmed structural coherence and the verification-vs-runtime separation.
 
 ## 12. Revision History
 
 | Version | Date | Notes |
 |---|---|---|
-| v0 (draft) | 2026-05-14 | Initial draft from extracted understanding of uncommitted GVF code. Pending owner ratification. |
+| v0 (draft) | 2026-05-14 | Initial draft from extracted understanding of uncommitted GVF code. |
+| **v1 (authoritative)** | **2026-05-14** | Ratified. GVF / GQI initialisms locked. `ExtensionMode.configure({...})` pattern adopted. `CODESPHERE_GOVERNANCE_STRICT=1` scoped to Development only. Foundational Principle elevated. §13 Bounded Expansion added. §14 Maturity Path added. |
+
+## 13. Bounded Expansion (v1 policy)
+
+GVF v1 is **structurally complete for the substrate's current truth**. Further expansion is *deliberately constrained* until operational hardening catches up to architectural ambition.
+
+### Forbidden until v0.1 review
+
+- **No new governance abstractions.** No additional "frameworks", "constitutions", or "verification layers" introduced.
+- **No new runtime layers.** No middleware, no policy engines, no inheritance of the bus into specialized variants.
+- **No new constitutional primitives.** The four invariants (3.1–3.4) are the set. Adding a fifth requires a v1.1 amendment with explicit ratification.
+- **No speculative replay engine.** Until `CausalLink` is populated authoritatively, no work on replay reconstruction.
+- **No AI orchestration substrate built on top of GVF.** The chat / context / daemon paths use GVF; they do not extend it.
+
+### Rationale
+
+Architectural inflation is the failure mode this project is most exposed to right now. Each new abstraction creates a typed surface that *implies* trust without delivering it (see §6 anti-pattern). The discipline of refusing additions, even tempting ones, is itself constitutional work.
+
+The policy ends when one of these is true:
+
+- A specific operational pain point cannot be solved within the existing primitives (force-justified expansion).
+- The Maturity Path (§14) is complete and a planned v1.1 broadens scope deliberately.
+
+## 14. Maturity Path
+
+The path from v1 (architecture complete) to operational maturity. Priority order. Each item must complete before the next is started — to enforce the §13 expansion policy.
+
+1. **Reconcile GVF implementation against the spec.** PR #4. The uncommitted code in the main worktree adopts:
+   - `EventBus.configure({ extensionMode, strictOverride })` bootstrap pattern.
+   - `emitter !== 'sys'` Silent Channel gating.
+   - Removal of wall-clock `validateTemporalInvariant` from the runtime path.
+   - NON-AUTHORITATIVE markers on `GovernanceStress`, `CausalLink`.
+2. **Migrate tests** to the new runtime-mode semantics per §8.2.
+3. **Add integration tests** covering UI ↔ EventBus ↔ AiService ↔ ContextService end-to-end. Not just unit tests of governance — flows under realistic event traffic.
+4. **Add replay fixtures.** Recorded trace sessions that can be loaded and verified — proves Replay Boundaries (§3.2) under controlled conditions.
+5. **Add observability UI.** Surface `TraceStore` and `getSnapshot()` to a developer view (uses Silent Channel for reads).
+6. **Profile performance under load.** Microbenchmark `deepFreeze` per-emit cost. Verify the §3.1 SLA empirically. Resolve §9 deferred item.
+7. **Validate crash recovery behavior.** What happens when the host process crashes mid-stream? Mid-deepFreeze? With pending unflushed traces?
+8. **Run adversarial concurrency tests.** Concurrent emits from multiple domains (chat streaming + context switching + daemon callbacks). Validates that the absence of temporal enforcement (§3.4) doesn't hide silent corruption.
+
+When 1–8 are complete, GVF is operationally mature. At that point, v1.1 amendments (re-introduction of Temporal Consistency, daemon-side constitutional layer, etc.) become reviewable.
 
 ---
 
-**Until §11 is signed off, treat this spec as a proposal, not a contract. The code on `feature/ai-native-core` is the operational reality; this document is the destination.**
+**v1 is the contract. The code reconciles to this document, not the other way around. Amendments follow §12 revision protocol with explicit ratification.**
