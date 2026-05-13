@@ -7,7 +7,7 @@ export type EventCallback<T = any> = (data: T) => void;
 /**
  * CodeSphere Global Event Bus.
  * Unified transport for UI ↔ Host ↔ Daemon.
- * Enforced by UPCM Governance with GOS Trace Pipeline.
+ * Enforced by UPCM Governance and GVF Constitutional Verification.
  */
 export class EventBus extends EventEmitter {
     private static _instance: EventBus;
@@ -25,45 +25,74 @@ export class EventBus extends EventEmitter {
     }
 
     /**
-     * Emits an event with governance validation and GOS tracing.
-     * Causal traceability is decoupled from execution outcome.
+     * Emits an event with authoritative governance and physical immutability guarantees.
+     * Five-phase pipeline:
+     *   1. Silent Channel bypass (sys/gqi/*) — system-only, no trace, no governance
+     *   2. Trace intent creation
+     *   3. UPCM governance decision (validateEmission)
+     *   4. Constitutional finalization (logEvent — may panic on invariant violation)
+     *   5. Authoritative execution (super.emit if allowed)
      */
     public emit(topic: string, data: any, emitter: Domain = 'sys'): boolean {
-        // A. Create Initial Trace
+        // 1. Silent Channel bypass.
+        // GQI (Governance Query Interface) channel — system-only. Spoofing
+        // attempts are rejected so the audit channel cannot be evaded by a
+        // compromised UI/host. See docs/design/gvf.md §3.3 / §7.
+        if (topic.startsWith('sys/gqi/')) {
+            if (emitter !== 'sys') {
+                return false;
+            }
+            return super.emit(topic, data);
+        }
+
+        // 2. Create trace intent.
         const trace: EventTrace = {
             id: Math.random().toString(36).substring(7),
             topic,
             emitter,
             timestamp: Date.now(),
             status: 'allowed',
-            payloadHash: this._hashPayload(data)
+            payloadHash: this._hashPayload(data),
+            causalLinks: []
         };
 
-        // B. Run Governance Decision
+        // 3. UPCM governance decision.
         const violation = GovernanceEnforcer.validateEmission(topic, data, emitter);
-        
-        if (violation) {
-            trace.status = 'blocked';
-            trace.violation = violation;
-            
-            // C. Finalize Trace & Push (Violation path)
-            ObservabilityService.logEvent(trace);
-            
-            console.error(`[EventBus] Governance Blocked [${violation.reasonCode}]: ${violation.message}`);
 
-            // Strict mode is opt-in. VS Code's extension host does not set NODE_ENV
-            // reliably, so we'd crash activation on any payload drift if we keyed
-            // strictness off NODE_ENV. Tests and dev tooling set this explicitly.
+        let finalizedTrace: EventTrace = trace;
+        if (violation) {
+            finalizedTrace = {
+                ...trace,
+                status: 'blocked',
+                violation
+            };
+        }
+
+        // 4. Constitutional finalization (Deep-Freeze + future temporal check).
+        // Constitutional invariant failures during finalization are unrecoverable.
+        // Strict-mode escalation is opt-in via CODESPHERE_GOVERNANCE_STRICT=1.
+        // VS Code's extension host does not set NODE_ENV reliably, so we key
+        // off an explicit flag instead. See docs/design/gvf.md §5.
+        try {
+            ObservabilityService.logEvent(finalizedTrace);
+        } catch (e) {
+            console.error(`[FATAL] Constitutional Violation: ${e instanceof Error ? e.message : String(e)}`);
             if (process.env.CODESPHERE_GOVERNANCE_STRICT === '1') {
-                throw new Error(violation.message);
+                throw e;
             }
             return false;
         }
 
-        // C. Finalize Trace & Push (Success path)
-        ObservabilityService.logEvent(trace);
-        
-        // Execute actual emission
+        // 5. Authoritative execution.
+        if (finalizedTrace.status === 'blocked') {
+            const v = finalizedTrace.violation!;
+            console.error(`[EventBus] Blocked [${v.reasonCode}]: ${v.message}`);
+            if (process.env.CODESPHERE_GOVERNANCE_STRICT === '1') {
+                throw new Error(v.message);
+            }
+            return false;
+        }
+
         return super.emit(topic, data);
     }
 
@@ -76,7 +105,6 @@ export class EventBus extends EventEmitter {
     }
 
     private _hashPayload(data: any): string {
-        // Minimal hash (length-based) for memory safety in traces
         try {
             return `len:${JSON.stringify(data).length}`;
         } catch {
