@@ -37,10 +37,33 @@ describe('EventBus', () => {
         expect(count).to.equal(0);
     });
 
-    it('should throw on unauthorized emission (Governance)', () => {
-        expect(() => {
+    it('should return false on unauthorized emission by default (Governance)', () => {
+        const original = process.env.CODESPHERE_GOVERNANCE_STRICT;
+        delete process.env.CODESPHERE_GOVERNANCE_STRICT;
+        try {
             // 'ui' is not authorized to emit 'chat/delta' (only 'chat' is)
-            eventBus.emit('chat/delta', { id: '1', delta: 'hi', version: '1.0.0' }, 'ui');
-        }).to.throw(/is not authorized to emit/);
+            const result = eventBus.emit('chat/delta', { id: '1', delta: 'hi', version: '1.0.0' }, 'ui');
+            expect(result).to.equal(false);
+        } finally {
+            if (original !== undefined) {
+                process.env.CODESPHERE_GOVERNANCE_STRICT = original;
+            }
+        }
+    });
+
+    it('should throw on unauthorized emission when strict mode is enabled', () => {
+        const original = process.env.CODESPHERE_GOVERNANCE_STRICT;
+        process.env.CODESPHERE_GOVERNANCE_STRICT = '1';
+        try {
+            expect(() => {
+                eventBus.emit('chat/delta', { id: '1', delta: 'hi', version: '1.0.0' }, 'ui');
+            }).to.throw(/is not authorized to emit/);
+        } finally {
+            if (original === undefined) {
+                delete process.env.CODESPHERE_GOVERNANCE_STRICT;
+            } else {
+                process.env.CODESPHERE_GOVERNANCE_STRICT = original;
+            }
+        }
     });
 });
