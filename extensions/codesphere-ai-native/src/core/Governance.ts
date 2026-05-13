@@ -26,6 +26,10 @@ export const EventRegistry: Record<string, EventContract> = {
         allowedEmitters: ['ui'],
         schema: z.object({
             text: z.string(),
+            history: z.array(z.object({
+                role: z.enum(['user', 'assistant', 'system']),
+                content: z.string()
+            })).optional(),
             version: z.string().default(PROTOCOL_VERSION)
         })
     },

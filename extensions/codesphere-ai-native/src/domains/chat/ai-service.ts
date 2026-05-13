@@ -2,17 +2,29 @@ import * as vscode from 'vscode';
 import { globalEventBus } from '../../core/EventBus';
 import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
 
+export interface ChatTurn {
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+}
+
+export interface ChatSendRequest {
+    text: string;
+    history?: ChatTurn[];
+}
+
 export class AiService {
     private static readonly OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+    private static readonly SYSTEM_PROMPT = 'You are CodeSphere AI, a concise coding assistant embedded in CodeSphere IDE.';
+    private static readonly MAX_HISTORY_TURNS = 40;
 
     constructor(private readonly secrets: vscode.SecretStorage) { }
 
-    public async handleChatSend(text: string, signal?: AbortSignal): Promise<void> {
+    public async handleChatSend(req: ChatSendRequest, signal?: AbortSignal): Promise<void> {
         const messageId = Math.random().toString(36).substring(7);
-        console.log(`[AiService] chat/send id=${messageId} text=${text.slice(0, 80)}`);
+        console.log(`[AiService] chat/send id=${messageId} history=${req.history?.length ?? 0} text=${req.text.slice(0, 80)}`);
 
         try {
-            await this.streamOpenRouterCompletion(text, messageId, signal);
+            await this.streamOpenRouterCompletion(req, messageId, signal);
         } catch (e) {
             if (signal?.aborted) {
                 console.log(`[AiService] stream aborted id=${messageId}`);
@@ -26,7 +38,7 @@ export class AiService {
     }
 
     private async streamOpenRouterCompletion(
-        text: string,
+        req: ChatSendRequest,
         messageId: string,
         signal?: AbortSignal
     ): Promise<void> {
@@ -39,6 +51,8 @@ export class AiService {
             .getConfiguration('codesphere.ai')
             .get<string>('openRouterModel', 'openai/gpt-oss-120b');
 
+        const messages = this.buildMessages(req);
+
         const response = await fetch(AiService.OPENROUTER_URL, {
             method: 'POST',
             signal,
@@ -50,16 +64,7 @@ export class AiService {
             },
             body: JSON.stringify({
                 model,
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are CodeSphere AI, a concise coding assistant embedded in CodeSphere IDE.'
-                    },
-                    {
-                        role: 'user',
-                        content: text
-                    }
-                ],
+                messages,
                 temperature: 0.7,
                 stream: true
             })
@@ -122,6 +127,18 @@ export class AiService {
         } else {
             throw new Error('OpenRouter returned an empty stream.');
         }
+    }
+
+    private buildMessages(req: ChatSendRequest): ChatTurn[] {
+        // Canonical system prompt is enforced server-side; drop any system turns
+        // the webview sent so it cannot override behavior via injected history.
+        const history = (req.history ?? []).filter(turn => turn.role !== 'system');
+        const trimmed = history.slice(-AiService.MAX_HISTORY_TURNS);
+        return [
+            { role: 'system', content: AiService.SYSTEM_PROMPT },
+            ...trimmed,
+            { role: 'user', content: req.text }
+        ];
     }
 
     private emitDelta(id: string, delta: string, done: boolean): void {

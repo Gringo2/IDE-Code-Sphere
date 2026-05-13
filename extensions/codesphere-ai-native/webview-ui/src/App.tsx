@@ -54,14 +54,17 @@ function App() {
   const handleSend = () => {
     if (!inputMessage.trim() || streamingId) return;
 
+    const text = inputMessage.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputMessage.trim()
+      content: text
     };
 
+    const history = messages.map(m => ({ role: m.role, content: m.content }));
+
     setMessages(prev => [...prev, userMessage]);
-    postMessage('chat/send', { text: inputMessage.trim() });
+    postMessage('chat/send', { text, history });
     setInputMessage('');
   };
 

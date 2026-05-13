@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { globalEventBus } from '../../core/EventBus';
-import { AiService } from './ai-service';
+import { AiService, ChatSendRequest } from './ai-service';
 import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
 
 export class ChatSidebarProvider implements vscode.WebviewViewProvider {
@@ -44,11 +44,11 @@ export class ChatSidebarProvider implements vscode.WebviewViewProvider {
 
         // Wire up AiService to listen for chat/send. Each send gets its own
         // AbortController so chat/stop can cancel the in-flight stream.
-        const chatSendListener = (data: { text: string }) => {
+        const chatSendListener = (data: ChatSendRequest) => {
             this._activeStream?.abort();
             this._activeStream = new AbortController();
             const controller = this._activeStream;
-            this._aiService.handleChatSend(data.text, controller.signal)
+            this._aiService.handleChatSend(data, controller.signal)
                 .finally(() => {
                     if (this._activeStream === controller) {
                         this._activeStream = undefined;
