@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EventBus } from '../../core/EventBus';
+import { EventBus, RuntimeMode } from '../../core/EventBus';
 import { TraceStore, ObservabilityService } from '../../core/Observability';
 
 describe('GVF: Constitutional Invariants', () => {
@@ -7,7 +7,11 @@ describe('GVF: Constitutional Invariants', () => {
 
     beforeEach(() => {
         eventBus = EventBus.getInstance();
+        eventBus.removeAllListeners();
         TraceStore['traces'] = []; // Force clear for tests
+        // Constitutional invariants are exercised in Test mode per §5.
+        EventBus._resetConfigForTests();
+        EventBus.configure({ mode: RuntimeMode.Test });
     });
 
     it('should prove Physical Immutability (Deep Freeze)', () => {
