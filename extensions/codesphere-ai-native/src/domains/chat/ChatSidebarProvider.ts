@@ -10,9 +10,10 @@ export class ChatSidebarProvider implements vscode.WebviewViewProvider {
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
-        secrets: vscode.SecretStorage
+        secrets: vscode.SecretStorage,
+        globalState: vscode.Memento
     ) {
-        this._aiService = new AiService(secrets);
+        this._aiService = new AiService(secrets, globalState);
     }
 
     public resolveWebviewView(

@@ -2,8 +2,10 @@ import * as vscode from 'vscode';
 import { ChatSidebarProvider } from './domains/chat/ChatSidebarProvider';
 import { ContextSidebarProvider } from './domains/context/ContextSidebarProvider';
 
+export const OPENROUTER_CONSENT_KEY = 'codesphere.ai.openRouterConsent.v1';
+
 export function activate(context: vscode.ExtensionContext) {
-    const chatProvider = new ChatSidebarProvider(context.extensionUri, context.secrets);
+    const chatProvider = new ChatSidebarProvider(context.extensionUri, context.secrets, context.globalState);
 
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
@@ -42,6 +44,13 @@ export function activate(context: vscode.ExtensionContext) {
 
             await context.secrets.store('codesphere.openRouterApiKey', apiKey.trim());
             vscode.window.showInformationMessage('CodeSphere AI OpenRouter API key saved.');
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('codesphere.ai.resetOpenRouterConsent', async () => {
+            await context.globalState.update(OPENROUTER_CONSENT_KEY, undefined);
+            vscode.window.showInformationMessage('CodeSphere AI OpenRouter consent reset. You will be prompted again on the next chat.');
         })
     );
 }

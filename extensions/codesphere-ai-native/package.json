@@ -23,6 +23,10 @@
             {
                 "command": "codesphere.ai.setOpenRouterKey",
                 "title": "CodeSphere AI: Set OpenRouter API Key"
+            },
+            {
+                "command": "codesphere.ai.resetOpenRouterConsent",
+                "title": "CodeSphere AI: Reset OpenRouter Consent"
             }
         ],
         "configuration": {

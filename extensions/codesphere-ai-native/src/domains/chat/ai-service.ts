@@ -16,11 +16,21 @@ export class AiService {
     private static readonly OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
     private static readonly SYSTEM_PROMPT = 'You are CodeSphere AI, a concise coding assistant embedded in CodeSphere IDE.';
     private static readonly MAX_HISTORY_TURNS = 40;
+    private static readonly CONSENT_KEY = 'codesphere.ai.openRouterConsent.v1';
 
-    constructor(private readonly secrets: vscode.SecretStorage) { }
+    constructor(
+        private readonly secrets: vscode.SecretStorage,
+        private readonly globalState: vscode.Memento
+    ) { }
 
     public async handleChatSend(req: ChatSendRequest, signal?: AbortSignal): Promise<void> {
         const messageId = Math.random().toString(36).substring(7);
+
+        if (!await this.ensureConsent()) {
+            this.emitDelta(messageId, 'Cancelled: OpenRouter consent not granted. Run "CodeSphere AI: Reset OpenRouter Consent" to re-prompt.', true);
+            return;
+        }
+
         console.log(`[AiService] chat/send id=${messageId} history=${req.history?.length ?? 0} text=${req.text.slice(0, 80)}`);
 
         try {
@@ -127,6 +137,29 @@ export class AiService {
         } else {
             throw new Error('OpenRouter returned an empty stream.');
         }
+    }
+
+    private async ensureConsent(): Promise<boolean> {
+        if (this.globalState.get<boolean>(AiService.CONSENT_KEY)) {
+            return true;
+        }
+
+        const choice = await vscode.window.showInformationMessage(
+            'CodeSphere AI sends your chat messages — including conversation history — to OpenRouter (openrouter.ai) using the API key you configured. Your prompts and any code you paste leave your machine. Continue?',
+            { modal: true },
+            'Allow and remember',
+            'Learn more'
+        );
+
+        if (choice === 'Allow and remember') {
+            await this.globalState.update(AiService.CONSENT_KEY, true);
+            return true;
+        }
+        if (choice === 'Learn more') {
+            vscode.env.openExternal(vscode.Uri.parse('https://openrouter.ai/privacy'));
+            return false;
+        }
+        return false;
     }
 
     private buildMessages(req: ChatSendRequest): ChatTurn[] {
