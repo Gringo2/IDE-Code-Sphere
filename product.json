@@ -63,11 +63,5 @@
       "version": "0.0.1",
       "id": "codesphere.codesphere-ai-native"
     }
-  ],
-  "appInsights": {
-    "instrumentationKey": ""
-  },
-  "appInsightsVortex": {
-    "instrumentationKey": ""
-  }
+  ]
 }
