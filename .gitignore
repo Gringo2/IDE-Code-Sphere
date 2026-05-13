@@ -12,6 +12,8 @@ CodeSphere-arm64-*
 CodeSphere-ia32-*
 .DS_Store
 *.env
+.env.local
+.env.*.local
 assets/
 build/linux/appimage/out
 build/linux/appimage/pkg2appimage.AppDir

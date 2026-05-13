@@ -45,8 +45,8 @@ interface PatchDescriptor {
 
 ## 5. Governance Enforcement Modes
 1. **Compile-Time**: Strict TypeScript types for all Event Names and Payloads.
-2. **Runtime (Dev)**: Zod-based validation of all Event Bus traffic.
-3. **Build-Time**: Dependency validation of the Patch Graph in `prepare_vscode.sh`.
+2. **Runtime**: Zod-based validation of all Event Bus traffic. Every violation is logged and the offending emission returns `false`. Strict-mode throws are opt-in via the `CODESPHERE_GOVERNANCE_STRICT=1` environment variable, set by tests and dev tooling. The flag is unset by default in packaged builds so a single misrouted event cannot crash extension activation.
+3. **Build-Time**: Dependency validation of the Patch Graph in `prepare_vscode.sh`. Currently skipped at MVP — re-enabled once per-patch `.patch.json` descriptors and `ts-node` at the repo root are in place.
 
 ## 6. The Negotiation Protocol
 All sessions MUST begin with a bidirectional handshake:

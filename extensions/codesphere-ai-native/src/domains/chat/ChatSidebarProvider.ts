@@ -1,17 +1,21 @@
 import * as vscode from 'vscode';
 import { globalEventBus } from '../../core/EventBus';
-import { AiService } from './ai-service';
+import { AiService, ChatSendRequest, ChatTurn } from './ai-service';
 import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
+import { ContextService } from '../context/context-service';
 
 export class ChatSidebarProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'codesphere.ai.chat';
     private readonly _aiService: AiService;
+    private _activeStream?: AbortController;
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
-        secrets: vscode.SecretStorage
+        secrets: vscode.SecretStorage,
+        globalState: vscode.Memento,
+        private readonly _contextService: ContextService
     ) {
-        this._aiService = new AiService(secrets);
+        this._aiService = new AiService(secrets, globalState);
     }
 
     public resolveWebviewView(
@@ -41,16 +45,41 @@ export class ChatSidebarProvider implements vscode.WebviewViewProvider {
 
         globalEventBus.on('chat/delta', chatDeltaListener);
 
-        // Wire up AiService to listen for chat/send
-        const chatSendListener = (data: { text: string }) => {
-            this._aiService.handleChatSend(data.text);
+        // Wire up AiService to listen for chat/send. Each send gets its own
+        // AbortController so chat/stop can cancel the in-flight stream. The
+        // host augments the webview's chat/send payload with implicit context
+        // (active file) before passing to the provider.
+        const chatSendListener = (data: { text: string; history?: ChatTurn[] }) => {
+            this._activeStream?.abort();
+            this._activeStream = new AbortController();
+            const controller = this._activeStream;
+            const req: ChatSendRequest = {
+                text: data.text,
+                history: data.history,
+                context: this._contextService.getItems()
+            };
+            this._aiService.handleChatSend(req, controller.signal)
+                .finally(() => {
+                    if (this._activeStream === controller) {
+                        this._activeStream = undefined;
+                    }
+                });
+        };
+
+        const chatStopListener = () => {
+            this._activeStream?.abort();
+            this._activeStream = undefined;
         };
 
         globalEventBus.on('chat/send', chatSendListener);
+        globalEventBus.on('chat/stop', chatStopListener);
 
         webviewView.onDidDispose(() => {
+            this._activeStream?.abort();
+            this._activeStream = undefined;
             globalEventBus.off('chat/delta', chatDeltaListener);
             globalEventBus.off('chat/send', chatSendListener);
+            globalEventBus.off('chat/stop', chatStopListener);
         });
     }
 

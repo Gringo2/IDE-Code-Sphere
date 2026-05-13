@@ -4,7 +4,7 @@ import { useVSCode } from './hooks/useVSCode';
 
 interface ContextItem {
   uri: string;
-  type: 'file' | 'folder' | 'selection';
+  type: 'file' | 'folder' | 'selection' | 'symbol' | 'snippet';
 }
 
 function ContextManager() {

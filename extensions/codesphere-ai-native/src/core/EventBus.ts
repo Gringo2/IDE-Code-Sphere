@@ -50,9 +50,11 @@ export class EventBus extends EventEmitter {
             ObservabilityService.logEvent(trace);
             
             console.error(`[EventBus] Governance Blocked [${violation.reasonCode}]: ${violation.message}`);
-            
-            if (process.env.NODE_ENV !== 'production') {
-                // In dev, we fail fast to alert the developer.
+
+            // Strict mode is opt-in. VS Code's extension host does not set NODE_ENV
+            // reliably, so we'd crash activation on any payload drift if we keyed
+            // strictness off NODE_ENV. Tests and dev tooling set this explicitly.
+            if (process.env.CODESPHERE_GOVERNANCE_STRICT === '1') {
                 throw new Error(violation.message);
             }
             return false;

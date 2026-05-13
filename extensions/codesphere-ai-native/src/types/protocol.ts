@@ -29,10 +29,12 @@ export interface ChatDelta {
     version?: string;
 }
 
+export type ContextItemType = 'file' | 'folder' | 'selection' | 'symbol' | 'snippet';
+
 export interface ContextItem {
     uri: string;
     content?: string;
-    type: 'file' | 'symbol' | 'snippet';
+    type: ContextItemType;
     version?: string;
 }
 

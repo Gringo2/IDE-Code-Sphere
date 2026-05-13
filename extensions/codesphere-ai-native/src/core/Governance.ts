@@ -26,6 +26,10 @@ export const EventRegistry: Record<string, EventContract> = {
         allowedEmitters: ['ui'],
         schema: z.object({
             text: z.string(),
+            history: z.array(z.object({
+                role: z.enum(['user', 'assistant', 'system']),
+                content: z.string()
+            })).optional(),
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
@@ -40,6 +44,15 @@ export const EventRegistry: Record<string, EventContract> = {
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
+    'chat/stop': {
+        topic: 'chat/stop',
+        owner: 'chat',
+        allowedEmitters: ['ui'],
+        schema: z.object({
+            id: z.string().optional(),
+            version: z.string().default(PROTOCOL_VERSION)
+        })
+    },
     'context/add': {
         topic: 'context/add',
         owner: 'context',
@@ -47,7 +60,7 @@ export const EventRegistry: Record<string, EventContract> = {
         schema: z.object({
             uri: z.string(),
             content: z.string().optional(),
-            type: z.enum(['file', 'symbol', 'snippet']),
+            type: z.enum(['file', 'folder', 'selection', 'symbol', 'snippet']),
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
@@ -58,7 +71,7 @@ export const EventRegistry: Record<string, EventContract> = {
         schema: z.object({
             uri: z.string(),
             content: z.string().optional(),
-            type: z.enum(['file', 'symbol', 'snippet']),
+            type: z.enum(['file', 'folder', 'selection', 'symbol', 'snippet']),
             version: z.string().default(PROTOCOL_VERSION)
         })
     },

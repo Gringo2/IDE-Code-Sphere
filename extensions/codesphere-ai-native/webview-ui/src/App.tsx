@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Send, Settings, History, User } from 'lucide-react';
+import { Sparkles, Send, Settings, History, User, Square } from 'lucide-react';
 import { useVSCode } from './hooks/useVSCode';
 
 interface Message {
@@ -11,29 +11,35 @@ interface Message {
 function App() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [streamingId, setStreamingId] = useState<string | null>(null);
   const { postMessage } = useVSCode();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { topic, data } = event.data;
-      
+
       if (topic === 'chat/delta') {
         setMessages(prev => {
           const lastMsg = prev[prev.length - 1];
           if (lastMsg && lastMsg.id === data.id) {
-            // Update existing assistant message
             const updated = [...prev];
             updated[updated.length - 1] = {
               ...lastMsg,
-              content: lastMsg.content + data.delta
+              content: lastMsg.content + (data.delta ?? '')
             };
             return updated;
-          } else {
-            // New assistant message
+          } else if (data.delta) {
             return [...prev, { id: data.id, role: 'assistant', content: data.delta }];
           }
+          return prev;
         });
+
+        if (data.done) {
+          setStreamingId(null);
+        } else {
+          setStreamingId(data.id);
+        }
       }
     };
 
@@ -46,17 +52,26 @@ function App() {
   }, [messages]);
 
   const handleSend = () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || streamingId) return;
 
+    const text = inputMessage.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputMessage.trim()
+      content: text
     };
 
+    const history = messages.map(m => ({ role: m.role, content: m.content }));
+
     setMessages(prev => [...prev, userMessage]);
-    postMessage('chat/send', { text: inputMessage.trim() });
+    postMessage('chat/send', { text, history });
     setInputMessage('');
+  };
+
+  const handleStop = () => {
+    if (!streamingId) return;
+    postMessage('chat/stop', { id: streamingId });
+    setStreamingId(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -120,13 +135,24 @@ function App() {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <button 
-            onClick={handleSend}
-            disabled={!inputMessage.trim()}
-            className="absolute right-2 bottom-2 p-1.5 rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors disabled:opacity-30"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+          {streamingId ? (
+            <button
+              onClick={handleStop}
+              aria-label="Stop generating"
+              className="absolute right-2 bottom-2 p-1.5 rounded-md bg-red-500/15 hover:bg-red-500/30 text-red-300 hover:text-red-100 transition-colors"
+            >
+              <Square className="w-4 h-4" fill="currentColor" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSend}
+              aria-label="Send message"
+              disabled={!inputMessage.trim()}
+              className="absolute right-2 bottom-2 p-1.5 rounded-md hover:bg-white/10 text-gray-400 hover:text-white transition-colors disabled:opacity-30"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <div className="text-[10px] text-center text-gray-500 mt-2">
           AI-generated code may be inaccurate.
