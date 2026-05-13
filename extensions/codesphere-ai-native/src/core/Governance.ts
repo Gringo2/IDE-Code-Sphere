@@ -47,7 +47,7 @@ export const EventRegistry: Record<string, EventContract> = {
         schema: z.object({
             uri: z.string(),
             content: z.string().optional(),
-            type: z.enum(['file', 'symbol', 'snippet']),
+            type: z.enum(['file', 'folder', 'selection', 'symbol', 'snippet']),
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
@@ -58,7 +58,7 @@ export const EventRegistry: Record<string, EventContract> = {
         schema: z.object({
             uri: z.string(),
             content: z.string().optional(),
-            type: z.enum(['file', 'symbol', 'snippet']),
+            type: z.enum(['file', 'folder', 'selection', 'symbol', 'snippet']),
             version: z.string().default(PROTOCOL_VERSION)
         })
     },
