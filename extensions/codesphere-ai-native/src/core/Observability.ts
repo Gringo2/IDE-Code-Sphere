@@ -2,11 +2,11 @@ import { Domain } from './Governance';
 import { RuntimeContract } from '../types/protocol';
 
 /**
- * GOS Constitutional Invariants (Physical Guarantees):
- * 1. Traces are physically immutable (deep-frozen).
- * 2. Causality is temporally consistent (logical time directionality).
- * 3. Replay boundaries are explicit (authoritative history).
- * 4. Invariant violations panic in strict mode.
+ * GVF Constitutional Invariants (Physical Guarantees), per docs/design/gvf.md §3:
+ *   3.1 Physical Immutability   — traces are deep-frozen.
+ *   3.2 Replay Boundaries        — TraceStore is a bounded circular buffer.
+ *   3.3 Recursion Isolation      — Silent Channel (sys/gqi/*) bypasses tracing.
+ *   3.4 Temporal Consistency    — DEFERRED until causal lineage is populated.
  */
 
 export interface GovernanceViolation {
@@ -16,6 +16,16 @@ export interface GovernanceViolation {
     readonly message: string;
 }
 
+/**
+ * NON-AUTHORITATIVE: Diagnostic scaffolding only.
+ * Typed surface for causal lineage. No runtime code constructs CausalLinks
+ * yet, so the causality graph is not load-bearing on replay or any other
+ * constitutional guarantee. Promotion to authoritative requires:
+ *   1. A populator that constructs links during emit.
+ *   2. Tests proving link semantics.
+ *   3. A spec entry in docs/design/gvf.md naming it.
+ * See docs/design/gvf.md §6.
+ */
 export interface CausalLink {
     readonly traceId: string;
     readonly topic: string;
@@ -35,6 +45,13 @@ export interface EventTrace {
     readonly causalLinks: ReadonlyArray<CausalLink>;
 }
 
+/**
+ * NON-AUTHORITATIVE: Diagnostic scaffolding only.
+ * Typed observability metric. Not yet computed by any subsystem and not
+ * read by any consumer. Promotion to authoritative requires a populator,
+ * a sampling cadence, and a consumer (likely the Silent Channel debug
+ * UI in §14 step 5). See docs/design/gvf.md §6.
+ */
 export interface GovernanceStress {
     readonly violationsPerMinute: number;
     readonly hotspotRules: Record<string, number>;
@@ -101,8 +118,20 @@ export class ObservabilityService {
     private static negotiatedContract?: RuntimeContract;
 
     /**
-     * Enforces logical time directionality.
-     * child.timestamp >= parent.timestamp
+     * NON-AUTHORITATIVE: Diagnostic-only helper.
+     *
+     * Wall-clock adjacency is not causality. Until CausalLink is populated
+     * by runtime lineage construction, this check cannot distinguish a real
+     * causal inversion from a concurrent emit with skewed clocks. The spec
+     * (docs/design/gvf.md §3.4) defers Temporal Consistency as a constitutional
+     * invariant until all three re-introduction conditions hold:
+     *   1. CausalLink populated authoritatively.
+     *   2. Causal parents identifiable from causalLinks.
+     *   3. Replay graph reconstruction implemented.
+     *
+     * Retained as an exported helper so future re-introduction (restated
+     * against the causal graph, NOT TraceStore.getLast()) doesn't need to
+     * rebuild the function. Not called from logEvent in v1.
      */
     public static validateTemporalInvariant(trace: EventTrace): void {
         const last = TraceStore.getLast();
@@ -112,7 +141,7 @@ export class ObservabilityService {
     }
 
     public static logEvent(trace: EventTrace) {
-        this.validateTemporalInvariant(trace);
+        // Temporal check intentionally NOT called here at v1. See validateTemporalInvariant docs.
         TraceStore.push(deepFreeze(trace));
     }
 

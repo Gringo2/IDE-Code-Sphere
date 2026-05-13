@@ -37,12 +37,16 @@ describe('GVF: Constitutional Invariants', () => {
         expect(finalCount).to.equal(initialCount);
     });
 
-    it('should prove Temporal Consistency (Logical Time)', () => {
-        // First event
+    // Temporal Consistency is DEFERRED per docs/design/gvf.md §3.4.
+    // validateTemporalInvariant is retained as a NON-AUTHORITATIVE diagnostic
+    // helper; it is no longer called from logEvent at runtime. The test below
+    // verifies the helper still detects an inverted timestamp when invoked
+    // directly, so that future re-introduction (against a real causal graph,
+    // not wall-clock adjacency) inherits a working primitive.
+    it('validateTemporalInvariant helper detects inverted timestamps (diagnostic only)', () => {
         eventBus.emit('chat/send', { text: 'first', version: '1.0.0' }, 'ui');
         const first = TraceStore.getLast()!;
 
-        // Manually try to log an event with an inverted timestamp
         const invertedTrace = {
             ...first,
             id: 'inverted',
@@ -50,8 +54,25 @@ describe('GVF: Constitutional Invariants', () => {
         };
 
         expect(() => {
-            ObservabilityService.logEvent(invertedTrace as any);
+            ObservabilityService.validateTemporalInvariant(invertedTrace as any);
         }).to.throw(/Temporal Invariant Violation/);
+    });
+
+    it('logEvent does NOT enforce temporal ordering at runtime (deferred per §3.4)', () => {
+        eventBus.emit('chat/send', { text: 'first', version: '1.0.0' }, 'ui');
+        const first = TraceStore.getLast()!;
+
+        const invertedTrace = Object.freeze({
+            ...first,
+            id: 'inverted',
+            timestamp: first.timestamp - 1000,
+            causalLinks: Object.freeze([])
+        });
+
+        // Must NOT throw — runtime path is temporal-unaware until causal lineage exists.
+        expect(() => {
+            ObservabilityService.logEvent(invertedTrace as any);
+        }).to.not.throw();
     });
 
     it('should Panic in Strict Mode on Invariant Violation', () => {
