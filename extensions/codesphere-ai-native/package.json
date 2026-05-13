@@ -78,6 +78,7 @@
         "check-types": "tsc --noEmit",
         "lint": "eslint src --ext ts",
         "test:unit": "mocha -r ts-node/register src/__tests__/**/*.test.ts",
+        "test": "node ./out/test/runTest.js",
         "build:webview": "cd webview-ui && npm install && npm run build"
     },
     "enabledApiProposals": [
