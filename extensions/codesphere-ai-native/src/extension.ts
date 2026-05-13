@@ -1,11 +1,20 @@
 import * as vscode from 'vscode';
 import { ChatSidebarProvider } from './domains/chat/ChatSidebarProvider';
 import { ContextSidebarProvider } from './domains/context/ContextSidebarProvider';
+import { ContextService } from './domains/context/context-service';
 
 export const OPENROUTER_CONSENT_KEY = 'codesphere.ai.openRouterConsent.v1';
 
 export function activate(context: vscode.ExtensionContext) {
-    const chatProvider = new ChatSidebarProvider(context.extensionUri, context.secrets, context.globalState);
+    const contextService = new ContextService();
+    context.subscriptions.push(contextService);
+
+    const chatProvider = new ChatSidebarProvider(
+        context.extensionUri,
+        context.secrets,
+        context.globalState,
+        contextService
+    );
 
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(

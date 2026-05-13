@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { globalEventBus } from '../../core/EventBus';
-import { ChatDelta, PROTOCOL_VERSION } from '../../types/protocol';
+import { ChatDelta, ContextItem, PROTOCOL_VERSION } from '../../types/protocol';
 
 export interface ChatTurn {
     role: 'user' | 'assistant' | 'system';
@@ -10,6 +10,7 @@ export interface ChatTurn {
 export interface ChatSendRequest {
     text: string;
     history?: ChatTurn[];
+    context?: ContextItem[];
 }
 
 export class AiService {
@@ -167,11 +168,29 @@ export class AiService {
         // the webview sent so it cannot override behavior via injected history.
         const history = (req.history ?? []).filter(turn => turn.role !== 'system');
         const trimmed = history.slice(-AiService.MAX_HISTORY_TURNS);
-        return [
+        const messages: ChatTurn[] = [
             { role: 'system', content: AiService.SYSTEM_PROMPT },
-            ...trimmed,
-            { role: 'user', content: req.text }
+            ...trimmed
         ];
+
+        const contextBlock = this.formatContext(req.context);
+        if (contextBlock) {
+            messages.push({ role: 'system', content: contextBlock });
+        }
+
+        messages.push({ role: 'user', content: req.text });
+        return messages;
+    }
+
+    private formatContext(items?: ContextItem[]): string | null {
+        if (!items || items.length === 0) {
+            return null;
+        }
+        const blocks = items.map(item => {
+            const header = `=== ${item.type}: ${item.uri} ===`;
+            return item.content ? `${header}\n${item.content}` : header;
+        });
+        return `Active workspace context:\n${blocks.join('\n\n')}`;
     }
 
     private emitDelta(id: string, delta: string, done: boolean): void {
