@@ -22,15 +22,18 @@ describe('CodeSphere AI Native — Integration', () => {
             expect(ext!.isActive, 'extension must be active after force-activate').to.equal(true);
         });
 
-        it('all three declared commands are registered', async () => {
-            const expected = [
-                'codesphere.ai.helloWorld',
-                'codesphere.ai.setOpenRouterKey',
-                'codesphere.ai.resetOpenRouterConsent'
-            ];
+        it('every command declared in the manifest is registered', async () => {
+            // Read the manifest dynamically so a 4th command added to
+            // contributes.commands without a matching registerCommand call
+            // surfaces here instead of slipping through.
+            const ext = vscode.extensions.getExtension(EXTENSION_ID)!;
+            const declared: string[] = (ext.packageJSON.contributes?.commands ?? []).map(
+                (c: { command: string }) => c.command
+            );
+            expect(declared.length, 'manifest must declare at least one command').to.be.greaterThan(0);
             const all = await vscode.commands.getCommands(true);
-            for (const cmd of expected) {
-                expect(all, `command ${cmd} must be registered`).to.include(cmd);
+            for (const cmd of declared) {
+                expect(all, `command ${cmd} (declared in manifest) must be registered`).to.include(cmd);
             }
         });
     });
@@ -45,6 +48,16 @@ describe('CodeSphere AI Native — Integration', () => {
         });
 
         it('re-configuring after Test bootstrap is a constitutional violation', () => {
+            // Precondition: activation must have already configured the bus
+            // in Test mode. Without it, configure() would succeed silently
+            // rather than throw — and this test would be a no-op rather than
+            // a contract check. Re-using the chat/delta unauthorized-emit
+            // tell keeps the dependency explicit without poking private state.
+            expect(
+                () => globalEventBus.emit('chat/delta', { id: '1', delta: 'x', version: '1.0.0' }, 'ui'),
+                'precondition: bus must already be in Test mode'
+            ).to.throw();
+
             expect(() => {
                 EventBus.configure({ mode: RuntimeMode.Production });
             }).to.throw(/Constitutional Violation/);
@@ -54,9 +67,13 @@ describe('CodeSphere AI Native — Integration', () => {
     describe('Silent Channel (GVF §3.3 / §7)', () => {
         it('sys/gqi/* emit from sys does not produce a trace', () => {
             const before = TraceStore.getRecent(1000).length;
-            const result = globalEventBus.emit('sys/gqi/probe', { ping: 1 }, 'sys');
+            // Don't assert the return value of emit() here. The silent-channel
+            // branch ends in super.emit() (Node's EventEmitter), which returns
+            // true iff there are listeners. Nothing listens to sys/gqi/probe,
+            // so the return is always false — a meaningless signal. The count
+            // delta below is the actual silence invariant.
+            globalEventBus.emit('sys/gqi/probe', { ping: 1 }, 'sys');
             const after = TraceStore.getRecent(1000).length;
-            expect(result, 'silent emit must succeed').to.equal(true);
             expect(after, 'silent channel must not record a trace').to.equal(before);
         });
 
@@ -91,8 +108,15 @@ describe('CodeSphere AI Native — Integration', () => {
                 });
                 await vscode.window.showTextDocument(doc);
 
-                // Editor-switch emit is synchronous, but give the event loop one tick.
-                await new Promise(resolve => setTimeout(resolve, 50));
+                // Poll instead of a fixed sleep. onDidChangeActiveTextEditor
+                // is dispatched through the host's event loop, so the wall
+                // time between showTextDocument resolving and the listener
+                // firing depends on Electron startup, CI load, and editor
+                // state. A 50ms fixed wait flakes on slow runners.
+                const deadline = Date.now() + 2000;
+                while (received.length === 0 && Date.now() < deadline) {
+                    await new Promise(resolve => setTimeout(resolve, 25));
+                }
 
                 expect(received.length, 'at least one context/add must have fired').to.be.greaterThan(0);
                 const item = received[received.length - 1];
