@@ -1,0 +1,28 @@
+{
+    "name": "governance-violation",
+    "description": "chat/delta from the ui domain is a UPCM-002 violation: ui is not in chat/delta's allowedEmitters (only 'chat' is). In Test mode, EventBus.emit pushes the trace with status='blocked' AND throws. Proves that violations produce both a recorded trace AND a runtime throw — the trace is authoritative even when emit fails.",
+    "mode": "test",
+    "input": [
+        {
+            "topic": "chat/delta",
+            "emitter": "ui",
+            "data": { "id": "violation-1", "delta": "ui has no right to emit this", "version": "1.0.0" }
+        }
+    ],
+    "expected": [
+        {
+            "topic": "chat/delta",
+            "emitter": "ui",
+            "status": "blocked",
+            "causalLinks": [],
+            "violation": {
+                "ruleId": "UPCM-002",
+                "reasonCode": "UNAUTHORIZED_EMITTER"
+            }
+        }
+    ],
+    "expectedGovernanceCalls": 1,
+    "expectedThrows": [
+        { "index": 0, "pattern": "is not authorized to emit" }
+    ]
+}

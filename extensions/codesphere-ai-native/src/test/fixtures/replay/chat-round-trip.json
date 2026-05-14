@@ -1,0 +1,28 @@
+{
+    "name": "chat-round-trip",
+    "description": "Happy path: ui sends a chat message, chat streams two deltas with the second carrying done=true. Every emit is allowed by governance, every trace lands in TraceStore with status='allowed'. Establishes the baseline determinism contract for non-blocked traffic.",
+    "mode": "test",
+    "input": [
+        {
+            "topic": "chat/send",
+            "emitter": "ui",
+            "data": { "text": "hi", "history": [], "version": "1.0.0" }
+        },
+        {
+            "topic": "chat/delta",
+            "emitter": "chat",
+            "data": { "id": "round-trip-1", "delta": "Hi", "version": "1.0.0" }
+        },
+        {
+            "topic": "chat/delta",
+            "emitter": "chat",
+            "data": { "id": "round-trip-1", "delta": " there", "done": true, "version": "1.0.0" }
+        }
+    ],
+    "expected": [
+        { "topic": "chat/send",  "emitter": "ui",   "status": "allowed", "causalLinks": [] },
+        { "topic": "chat/delta", "emitter": "chat", "status": "allowed", "causalLinks": [] },
+        { "topic": "chat/delta", "emitter": "chat", "status": "allowed", "causalLinks": [] }
+    ],
+    "expectedGovernanceCalls": 3
+}

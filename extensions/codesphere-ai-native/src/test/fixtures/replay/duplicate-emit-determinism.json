@@ -1,0 +1,22 @@
+{
+    "name": "duplicate-emit-determinism",
+    "description": "Refinement #8: same event emitted twice must produce identical canonical traces (modulo the runtime id stripped by canonicalizeTrace). This catches accidental hidden state accumulation in the substrate — anything that would cause the second emit's trace to differ structurally from the first. Cheap to run, high-signal for replay determinism: if it fails, something in EventBus or the governance path is reading state it shouldn't be.",
+    "mode": "test",
+    "input": [
+        {
+            "topic": "chat/send",
+            "emitter": "ui",
+            "data": { "text": "ping", "history": [], "version": "1.0.0" }
+        },
+        {
+            "topic": "chat/send",
+            "emitter": "ui",
+            "data": { "text": "ping", "history": [], "version": "1.0.0" }
+        }
+    ],
+    "expected": [
+        { "topic": "chat/send", "emitter": "ui", "status": "allowed", "causalLinks": [] },
+        { "topic": "chat/send", "emitter": "ui", "status": "allowed", "causalLinks": [] }
+    ],
+    "expectedGovernanceCalls": 2
+}

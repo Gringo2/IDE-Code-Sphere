@@ -1,0 +1,40 @@
+{
+    "name": "mixed-outcome-ordering",
+    "description": "Refinement #6: mixed-outcome ordering is where replay systems rot first. This fixture interleaves allowed→blocked→allowed. The substrate must produce traces in this exact order, regardless of whether the middle emit throws. Tests two things at once: (a) ordering stability across governance branches, and (b) that a throw mid-sequence does not corrupt the buffer or the runner's outcome bookkeeping.",
+    "mode": "test",
+    "input": [
+        {
+            "topic": "chat/send",
+            "emitter": "ui",
+            "data": { "text": "first allowed", "history": [], "version": "1.0.0" }
+        },
+        {
+            "topic": "chat/delta",
+            "emitter": "ui",
+            "data": { "id": "mixed-1", "delta": "this is blocked", "version": "1.0.0" }
+        },
+        {
+            "topic": "chat/send",
+            "emitter": "ui",
+            "data": { "text": "second allowed", "history": [], "version": "1.0.0" }
+        }
+    ],
+    "expected": [
+        { "topic": "chat/send",  "emitter": "ui", "status": "allowed", "causalLinks": [] },
+        {
+            "topic": "chat/delta",
+            "emitter": "ui",
+            "status": "blocked",
+            "causalLinks": [],
+            "violation": {
+                "ruleId": "UPCM-002",
+                "reasonCode": "UNAUTHORIZED_EMITTER"
+            }
+        },
+        { "topic": "chat/send",  "emitter": "ui", "status": "allowed", "causalLinks": [] }
+    ],
+    "expectedGovernanceCalls": 3,
+    "expectedThrows": [
+        { "index": 1, "pattern": "is not authorized to emit" }
+    ]
+}
