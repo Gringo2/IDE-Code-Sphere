@@ -1,0 +1,32 @@
+{
+    "name": "silent-channel",
+    "description": "Asserts BOTH halves of the §3.3 Silent Channel invariant: (1) sys/gqi/* emits produce no trace and (2) governance is NEVER evaluated for them. The fixture bookends two silent emits (one legitimate from sys, one spoofed from ui) with two allowed non-silent emits. Expected: exactly 2 traces (the bookends), and exactly 2 governance calls (also the bookends). If governance ever leaked into the silent path, governanceCalls would be 4. If the silent path ever started tracing, expected.length would be 4. Either drift fails the fixture loudly.",
+    "mode": "test",
+    "input": [
+        {
+            "topic": "chat/send",
+            "emitter": "ui",
+            "data": { "text": "before silent", "history": [], "version": "1.0.0" }
+        },
+        {
+            "topic": "sys/gqi/probe",
+            "emitter": "sys",
+            "data": { "ping": 1 }
+        },
+        {
+            "topic": "sys/gqi/probe",
+            "emitter": "ui",
+            "data": { "ping": 1 }
+        },
+        {
+            "topic": "chat/stop",
+            "emitter": "ui",
+            "data": { "id": "silent-fixture", "version": "1.0.0" }
+        }
+    ],
+    "expected": [
+        { "topic": "chat/send", "emitter": "ui", "status": "allowed", "causalLinks": [] },
+        { "topic": "chat/stop", "emitter": "ui", "status": "allowed", "causalLinks": [] }
+    ],
+    "expectedGovernanceCalls": 2
+}
