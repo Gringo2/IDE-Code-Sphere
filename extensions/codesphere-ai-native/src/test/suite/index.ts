@@ -3,16 +3,18 @@ import Mocha from 'mocha';
 import { glob } from 'glob';
 
 export function run(): Promise<void> {
-    // Create the mocha test
     const mocha = new Mocha({
-        ui: 'tdd',
-        color: true
+        ui: 'bdd',
+        color: true,
+        timeout: 20000
     });
 
-    const testsRoot = path.resolve(__dirname, '..');
+    // Constrain to integration tests only. Unit tests under out/__tests__/
+    // use a different UI and run via the separate `test:unit` script.
+    const testsRoot = __dirname;
 
     return new Promise(async (c, e) => {
-        const files = await glob('**/**.test.js', { cwd: testsRoot });
+        const files = await glob('**/*.test.js', { cwd: testsRoot });
 
         // Add files to the test suite
         files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
